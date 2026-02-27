@@ -30,13 +30,15 @@ public class MenuActivity extends AppCompatActivity {
             return insets;
         });
 
+        MainActivity main = new MainActivity();
+
         txtBienvenida = findViewById(R.id.Bienvenida);
+        txtBienvenida.setText("Hola");
     }
 
     public void menu(View view){
 
         txtBienvenida.setText("hola admin");
-
 
     }
 

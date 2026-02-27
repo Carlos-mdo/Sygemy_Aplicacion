@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -18,10 +19,14 @@ import java.sql.SQLData;
 import java.time.Instant;
 
 import Datos.AdminSQLiteOpenHelper;
+import Entidades.Usuarios;
+import Servicios.ServicioAdmin;
 
 public class MainActivity extends AppCompatActivity {
 
     private EditText etUsuario, etContrasenia;
+    public TextView txt_UsuarioRol;
+    ServicioAdmin servAdmin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,10 +39,10 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
+        servAdmin = new ServicioAdmin(this);
         etUsuario = findViewById(R.id.editTextUsuario);
         etContrasenia = findViewById(R.id.editTextContrasenia);
     }
-
 
     public boolean validaciones () {
 
@@ -87,14 +92,18 @@ public class MainActivity extends AppCompatActivity {
     public void btnIniciar (View view){
 
         if(!validaciones()){
-            return;
+            return ;
         }
 
-        iniciarSesion();
+        if(servAdmin.buscarAdmin(etUsuario,etContrasenia)){
+            Intent intent = new Intent(this, MenuActivity.class);
+            startActivity(intent);
+        }
+        else{
+            Toast.makeText(this,"error al buscar",Toast.LENGTH_SHORT).show();
+        }
 
-        Intent intent = new Intent(this, MenuActivity.class);
-        startActivity(intent);
-
+        //iniciarSesion();
     }
 
 }
