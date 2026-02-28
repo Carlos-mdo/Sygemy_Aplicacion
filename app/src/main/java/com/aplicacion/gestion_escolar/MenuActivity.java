@@ -33,7 +33,7 @@ public class MenuActivity extends AppCompatActivity {
         MainActivity main = new MainActivity();
 
         txtBienvenida = findViewById(R.id.Bienvenida);
-        txtBienvenida.setText("Hola");
+        txtBienvenida.setText("Hola admin");
     }
 
     public void menu(View view){

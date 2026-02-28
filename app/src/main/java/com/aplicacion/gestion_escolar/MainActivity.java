@@ -24,7 +24,7 @@ import Servicios.ServicioAdmin;
 
 public class MainActivity extends AppCompatActivity {
 
-    private EditText etUsuario, etContrasenia;
+    protected EditText etUsuario, etContrasenia;
     public TextView txt_UsuarioRol;
     ServicioAdmin servAdmin;
 
@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         }
         else{
-            Toast.makeText(this,"error al buscar",Toast.LENGTH_SHORT).show();
+            Toast.makeText(this,"error al buscar al usuario",Toast.LENGTH_SHORT).show();
         }
 
         //iniciarSesion();

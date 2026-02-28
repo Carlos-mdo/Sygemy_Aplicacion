@@ -13,7 +13,7 @@ public class ServicioAdmin {
     protected Context context;
     protected boolean estado;
     private AdminSQLiteOpenHelper admin;
-    private  SQLiteDatabase base_Datos;
+    private SQLiteDatabase base_Datos;
     private ContentValues adminRegis = new ContentValues();
 
     public ServicioAdmin(Context context){
@@ -35,6 +35,7 @@ public class ServicioAdmin {
 
         if (usuarAdmin.moveToFirst()) {
             if(contraAdmin.moveToFirst()){
+
                 if (etUsuario.getText().toString().equals(usuarAdmin.getString(0)) && etContrasenia.getText().toString().equals(contraAdmin.getString(0))) {
                     estado = true;
                 }
