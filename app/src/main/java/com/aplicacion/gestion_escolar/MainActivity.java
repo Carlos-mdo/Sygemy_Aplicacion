@@ -21,12 +21,17 @@ import java.time.Instant;
 import Datos.AdminSQLiteOpenHelper;
 import Entidades.Usuarios;
 import Servicios.ServicioAdmin;
+import Servicios.ServicioProfesores;
+import Servicios.ServicioUsuario;
 
 public class MainActivity extends AppCompatActivity {
 
     protected EditText etUsuario, etContrasenia;
     public TextView txt_UsuarioRol;
-    ServicioAdmin servAdmin;
+    //ServicioAdmin servAdmin;
+    //ServicioProfesores servProfe;
+    ServicioUsuario servUsuario;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,9 +44,12 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        servAdmin = new ServicioAdmin(this);
+        //servAdmin = new ServicioAdmin(this);
+        //servProfe = new ServicioProfesores(this);
+        servUsuario = new ServicioUsuario(this);
         etUsuario = findViewById(R.id.editTextUsuario);
         etContrasenia = findViewById(R.id.editTextContrasenia);
+
     }
 
     public boolean validaciones () {
@@ -65,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void iniciarSesion(){
-        AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this, "administracion", null, 1);
+        AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this, "BD_Sygemy", null, 1);
         SQLiteDatabase baseDeDatos = admin.getWritableDatabase();
 
         String _usuario = etUsuario.getText().toString();
@@ -92,15 +100,35 @@ public class MainActivity extends AppCompatActivity {
     public void btnIniciar (View view){
 
         if(!validaciones()){
-            return ;
+            return;
         }
 
-        if(servAdmin.buscarAdmin(etUsuario,etContrasenia)){
+//        if(servAdmin.buscarAdmin(etUsuario,etContrasenia)){
+//            Intent intent = new Intent(this, MenuActivity.class);
+//            startActivity(intent);
+//        }
+//        else{
+//            //Toast.makeText(this,"error al buscar al admin",Toast.LENGTH_SHORT).show();
+//        }
+//
+//        if(servProfe.buscarProfe(etUsuario,etContrasenia)){
+//            Intent intent = new Intent(this, MenuActivity.class);
+//            startActivity(intent);
+//        }
+//        else{
+//            Toast.makeText(this,"error al buscar al profe",Toast.LENGTH_SHORT).show();
+//        }
+
+        String rol = servUsuario.BuscarUsuario(etUsuario,etContrasenia);
+
+        if(rol!=null){
             Intent intent = new Intent(this, MenuActivity.class);
+            intent.putExtra("ROL_USUARIO", rol);
             startActivity(intent);
         }
-        else{
-            Toast.makeText(this,"error al buscar al usuario",Toast.LENGTH_SHORT).show();
+        else
+        {
+            Toast.makeText(this,"error al buscar el usuario",Toast.LENGTH_SHORT).show();
         }
 
         //iniciarSesion();

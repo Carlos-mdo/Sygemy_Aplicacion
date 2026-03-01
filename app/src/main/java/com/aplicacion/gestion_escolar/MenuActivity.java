@@ -33,12 +33,13 @@ public class MenuActivity extends AppCompatActivity {
         MainActivity main = new MainActivity();
 
         txtBienvenida = findViewById(R.id.Bienvenida);
-        txtBienvenida.setText("Hola admin");
+        String rol = getIntent().getStringExtra("ROL_USUARIO");
+        txtBienvenida.setText("Hola " + rol);
     }
 
     public void menu(View view){
 
-        txtBienvenida.setText("hola admin");
+        //txtBienvenida.setText("hola");
 
     }
 
