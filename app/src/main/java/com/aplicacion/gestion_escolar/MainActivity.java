@@ -22,7 +22,6 @@ import Servicios.ServicioUsuario;
 public class MainActivity extends AppCompatActivity {
 
     protected EditText etUsuario, etContrasenia;
-    public TextView txt_UsuarioRol;
     ServicioAdmin servAdmin;
     ServicioUsuario servUsuario;
     public String rol;
