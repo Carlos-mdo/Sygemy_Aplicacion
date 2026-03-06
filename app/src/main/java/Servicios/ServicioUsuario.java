@@ -16,6 +16,7 @@ public class ServicioUsuario {
     private AdminSQLiteOpenHelper usuario;
     private SQLiteDatabase base_Datos;
     private ContentValues usuarioRegis = new ContentValues();
+    public String rol;
 
     public ServicioUsuario (Context context){
         this.context = context;
@@ -23,19 +24,18 @@ public class ServicioUsuario {
         base_Datos = usuario.getWritableDatabase();
     }
 
-    public String BuscarUsuario(EditText etUsuario, EditText etContrasenia) {
+    public String buscarUsuario(String etUsuario, String etContrasenia) {
 
-        String usuarioTexto = etUsuario.getText().toString();
-        String contraseniaTexto = etContrasenia.getText().toString();
-        String rol = null;
 
         Cursor cursor = base_Datos.rawQuery(
                 "SELECT * FROM usuarios WHERE usuario=? AND contrasenia=?",
-                new String[]{usuarioTexto, contraseniaTexto}
+                new String[]{etUsuario, etContrasenia}
         );
 
         if (cursor.moveToFirst()) {
             rol = cursor.getString(3);
+        }else{
+            rol = null;
         }
 
         cursor.close();

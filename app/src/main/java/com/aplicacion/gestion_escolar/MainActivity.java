@@ -15,22 +15,17 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import java.sql.SQLData;
-import java.time.Instant;
-
 import Datos.AdminSQLiteOpenHelper;
-import Entidades.Usuarios;
 import Servicios.ServicioAdmin;
-import Servicios.ServicioProfesores;
 import Servicios.ServicioUsuario;
 
 public class MainActivity extends AppCompatActivity {
 
     protected EditText etUsuario, etContrasenia;
     public TextView txt_UsuarioRol;
-    //ServicioAdmin servAdmin;
-    //ServicioProfesores servProfe;
+    ServicioAdmin servAdmin;
     ServicioUsuario servUsuario;
+    public String rol;
 
 
     @Override
@@ -44,8 +39,7 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        //servAdmin = new ServicioAdmin(this);
-        //servProfe = new ServicioProfesores(this);
+        servAdmin = new ServicioAdmin(this);
         servUsuario = new ServicioUsuario(this);
         etUsuario = findViewById(R.id.editTextUsuario);
         etContrasenia = findViewById(R.id.editTextContrasenia);
@@ -103,32 +97,28 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-//        if(servAdmin.buscarAdmin(etUsuario,etContrasenia)){
-//            Intent intent = new Intent(this, MenuActivity.class);
-//            startActivity(intent);
-//        }
-//        else{
-//            //Toast.makeText(this,"error al buscar al admin",Toast.LENGTH_SHORT).show();
-//        }
-//
-//        if(servProfe.buscarProfe(etUsuario,etContrasenia)){
-//            Intent intent = new Intent(this, MenuActivity.class);
-//            startActivity(intent);
-//        }
-//        else{
-//            Toast.makeText(this,"error al buscar al profe",Toast.LENGTH_SHORT).show();
-//        }
-
-        String rol = servUsuario.BuscarUsuario(etUsuario,etContrasenia);
+        rol = servUsuario.buscarUsuario(etUsuario.getText().toString(),etContrasenia.getText().toString());
 
         if(rol!=null){
-            Intent intent = new Intent(this, MenuActivity.class);
-            intent.putExtra("ROL_USUARIO", rol);
-            startActivity(intent);
-        }
-        else
+
+            if(rol.equals("admin")){
+                Intent intent = new Intent(this, MenuActivity.class);
+                startActivity(intent);
+            }
+            else if(rol.equals("profesor")){
+
+                Intent intent = new Intent(this, ProfesorActivity.class);
+                //intent.putExtra("ROL_USUARIO", rol);
+                startActivity(intent);
+            }
+            else
+            {
+                Toast.makeText(this,"error al buscar el usuario",Toast.LENGTH_SHORT).show();
+            }
+
+        }else
         {
-            Toast.makeText(this,"error al buscar el usuario",Toast.LENGTH_SHORT).show();
+            Toast.makeText(this,"Ningun dato fue recibido",Toast.LENGTH_SHORT).show();
         }
 
         //iniciarSesion();

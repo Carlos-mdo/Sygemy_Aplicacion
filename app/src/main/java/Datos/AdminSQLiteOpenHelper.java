@@ -7,6 +7,8 @@ import androidx.annotation.Nullable;
 
 import java.util.Base64;
 
+import Entidades.Usuarios;
+
 public class AdminSQLiteOpenHelper extends SQLiteOpenHelper{
 
     public AdminSQLiteOpenHelper(@Nullable Context context, @Nullable String name, @Nullable SQLiteDatabase.CursorFactory factory, int version) {
@@ -21,6 +23,9 @@ public class AdminSQLiteOpenHelper extends SQLiteOpenHelper{
                 "usuario TEXT NOT NULL UNIQUE," +
                 "contrasenia TEXT NOT NULL," +
                 "rol TEXT NOT NULL)");
+
+        Usuarios admin = new Usuarios("admin","admin123","admin");
+        BaseDeDatos.insert("usuarios",null,admin.Valores());
 
         BaseDeDatos.execSQL("CREATE TABLE profesores (" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT," +

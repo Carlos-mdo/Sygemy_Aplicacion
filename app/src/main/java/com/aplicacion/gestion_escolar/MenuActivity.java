@@ -12,12 +12,19 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.viewpager2.widget.ViewPager2;
 
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
+
+import Adapter.TabAdapter;
 import Datos.AdminSQLiteOpenHelper;
 
 public class MenuActivity extends AppCompatActivity {
 
     private TextView txtBienvenida;
+    public TabLayout tabLay;
+    public ViewPager2 view2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,12 +39,26 @@ public class MenuActivity extends AppCompatActivity {
 
         MainActivity main = new MainActivity();
 
-        txtBienvenida = findViewById(R.id.Bienvenida);
-        String rol = getIntent().getStringExtra("ROL_USUARIO");
-        txtBienvenida.setText("Hola " + rol);
+//        txtBienvenida = findViewById(R.id.Bienvenida);
+//        String rol = getIntent().getStringExtra("ROL_USUARIO");
+//        txtBienvenida.setText("Hola " + rol);
+        tabLay = findViewById(R.id.tabLayout);
+        view2 = findViewById(R.id.tabView2);
+
+        TabAdapter adapterTab = new TabAdapter(this);
+
+        view2.setAdapter(adapterTab);
+
+        final String[] titles = new String[]{"Profesores","Alumnos","Detalles"};
+
+        new TabLayoutMediator(tabLay,view2,
+                (tab,position) -> tab.setText(titles[position])
+        ).attach();
+
     }
 
     public void menu(View view){
+
 
         //txtBienvenida.setText("hola");
 

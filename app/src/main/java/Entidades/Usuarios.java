@@ -1,5 +1,7 @@
 package Entidades;
 
+import android.content.ContentValues;
+
 public class Usuarios {
 
     int id;
@@ -7,6 +9,22 @@ public class Usuarios {
     String contrasenia;
     String rol;
 
+    public Usuarios(String usuario, String contrasenia, String rol){
+        this.usuario = usuario;
+        this.contrasenia = contrasenia;
+        this.rol = rol;
+    }
+
+    public Usuarios(){}
+    public ContentValues Valores() {
+        ContentValues valores = new ContentValues();
+
+        valores.put("usuario", usuario);
+        valores.put("contrasenia", contrasenia);
+        valores.put("rol", rol);
+
+        return valores;
+    }
     public void setId(int _id) {
         id = _id;
     }
