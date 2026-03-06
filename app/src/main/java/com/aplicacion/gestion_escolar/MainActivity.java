@@ -66,30 +66,30 @@ public class MainActivity extends AppCompatActivity {
         return estado;
     }
 
-    public void iniciarSesion(){
-        AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this, "BD_Sygemy", null, 1);
-        SQLiteDatabase baseDeDatos = admin.getWritableDatabase();
-
-        String _usuario = etUsuario.getText().toString();
-        String _contrasenia = etContrasenia.getText().toString();
-
-        if(!_usuario.isEmpty() && ! _contrasenia.isEmpty()){
-            ContentValues registrar = new ContentValues();
-
-            registrar.put("usuario", _usuario);
-            registrar.put("contrasenia", _contrasenia);
-
-            baseDeDatos.insert("usuarios", null, registrar);
-
-            baseDeDatos.close();
-
-            etUsuario.setText("");
-            etContrasenia.setText("");
-
-        } else {
-            Toast.makeText(this, "Completar todos los campos", Toast.LENGTH_SHORT).show();
-        }
-    }
+//    public void iniciarSesion(){
+//        AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this, "BD_Sygemy", null, 1);
+//        SQLiteDatabase baseDeDatos = admin.getWritableDatabase();
+//
+//        String _usuario = etUsuario.getText().toString();
+//        String _contrasenia = etContrasenia.getText().toString();
+//
+//        if(!_usuario.isEmpty() && ! _contrasenia.isEmpty()){
+//            ContentValues registrar = new ContentValues();
+//
+//            registrar.put("usuario", _usuario);
+//            registrar.put("contrasenia", _contrasenia);
+//
+//            baseDeDatos.insert("usuarios", null, registrar);
+//
+//            baseDeDatos.close();
+//
+//            etUsuario.setText("");
+//            etContrasenia.setText("");
+//
+//        } else {
+//            Toast.makeText(this, "Completar todos los campos", Toast.LENGTH_SHORT).show();
+//        }
+//    }
 
     public void btnIniciar (View view){
 
@@ -108,7 +108,6 @@ public class MainActivity extends AppCompatActivity {
             else if(rol.equals("profesor")){
 
                 Intent intent = new Intent(this, ProfesorActivity.class);
-                //intent.putExtra("ROL_USUARIO", rol);
                 startActivity(intent);
             }
             else
