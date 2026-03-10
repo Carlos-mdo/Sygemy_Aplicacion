@@ -1,19 +1,42 @@
 package Ventana.Admin;
 
+import android.content.ContentValues;
+import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.Spinner;
+import android.widget.Toast;
 
+import com.aplicacion.gestion_escolar.MainActivity;
+import com.aplicacion.gestion_escolar.MenuActivity;
 import com.aplicacion.gestion_escolar.R;
+
+import Datos.AdminSQLiteOpenHelper;
 
 public class Fragment_Alumnos extends Fragment {
 
-    private String mParam1;
-    private String mParam2;
+    public String[] generos = {"Seleccionar","Femenino","Masculino"};
+    public Spinner spinnerGenero;
+    public EditText etDni,etNombre,etApellido,etUsuario, etContrasenia;
+    public Button btnGuardado;
+    public ImageButton btnRegreso;
+    protected AdminSQLiteOpenHelper datos;
+    protected SQLiteDatabase baseDeDatos;
+    protected ContentValues valores = new ContentValues();
+    public Boolean estado;
+
 
     public Fragment_Alumnos() {
     }
@@ -32,7 +55,100 @@ public class Fragment_Alumnos extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment__alumnos, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        datos = new AdminSQLiteOpenHelper(requireContext(),"BD_Sygemy",null,1);
+        baseDeDatos = datos.getWritableDatabase();
+
+        etDni = view.findViewById(R.id.etDniAlum);
+        etNombre = view.findViewById(R.id.etNombreAlum);
+        etApellido = view.findViewById(R.id.etApellidoAlum);
+        etUsuario = view.findViewById(R.id.etUsuarioAlum);
+        etContrasenia = view.findViewById(R.id.etContraseniaAlum);
+        spinnerGenero = view.findViewById(R.id.spinGenero);
+
+        btnGuardado = view.findViewById(R.id.btnAgregarAlum);
+        btnRegreso = view.findViewById(R.id.btnRegresoAlum);
+
+        ArrayAdapter<String> array = new ArrayAdapter<String>(requireContext(), android.R.layout.simple_spinner_item,generos);
+
+        array.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        spinnerGenero.setAdapter(array);
+
+        btnGuardado.setOnClickListener(view1 -> guardarAlumno());
+        Intent intent = new Intent(getContext(), MainActivity.class);
+
+        btnRegreso.setOnClickListener(view1 -> startActivity(intent));
+
+        if(!validacionAlumnos()){
+            return;
+        }else{
+            Toast.makeText(getContext(),"Complete todos los campos",Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void guardarAlumno(){
+
+        valores.put("usuario",etUsuario.getText().toString());
+        valores.put("contrasenia",etContrasenia.getText().toString());
+        valores.put("rol","alumno");
+
+        baseDeDatos.insert("usuarios",null,valores);
+
+        valores.put("dni_alum",etDni.getText().toString());
+        valores.put("nombre_alum",etNombre.getText().toString());
+        valores.put("apellido_alum",etContrasenia.getText().toString());
+        valores.put("genero_alum",spinnerGenero.getSelectedItem().toString());
+
+        baseDeDatos.insert("alumnos",null,valores);
+
+        etDni.setText("");
+        etNombre.setText("");
+        etApellido.setText("");
+        etUsuario.setText("");
+        etContrasenia.setText("");
+
+        baseDeDatos.close();
+    }
+
+    public boolean validacionAlumnos(){
+        estado = true;
+
+        etDni.setError(null);
+        etNombre.setError(null);
+        etApellido.setError(null);
+        etUsuario.setError(null);
+        etContrasenia.setError(null);
+
+        if(etDni.getText().toString().isEmpty()){
+            etDni.setError("Ingrese el DNI");
+            estado = false;
+        }
+        if(etNombre.getText().toString().isEmpty()){
+            etNombre.setError("Ingrese el nombre del alumno");
+            estado = false;
+        }
+        if(etApellido.getText().toString().isEmpty()){
+            etApellido.setError("Ingrese el apellido del alumno");
+            estado = false;
+        }
+        if(etUsuario.getText().toString().isEmpty()){
+            etUsuario.setError("Ingrese el usuario del alumno");
+            estado = false;
+        }
+        if(etContrasenia.getText().toString().isEmpty()){
+            etContrasenia.setError("Ingrese la contraseña del alumno");
+            estado = false;
+        }
+
+        //Actualmente no existe un if para verificar el contenido del Spinner debido a errores constantes.
+
+        return estado;
     }
 }

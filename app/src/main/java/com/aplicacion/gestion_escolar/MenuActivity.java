@@ -22,7 +22,6 @@ import Datos.AdminSQLiteOpenHelper;
 
 public class MenuActivity extends AppCompatActivity {
 
-    private TextView txtBienvenida;
     public TabLayout tabLay;
     public ViewPager2 view2;
 
@@ -39,9 +38,6 @@ public class MenuActivity extends AppCompatActivity {
 
         MainActivity main = new MainActivity();
 
-//        txtBienvenida = findViewById(R.id.Bienvenida);
-//        String rol = getIntent().getStringExtra("ROL_USUARIO");
-//        txtBienvenida.setText("Hola " + rol);
         tabLay = findViewById(R.id.tabLayout);
         view2 = findViewById(R.id.tabView2);
 
@@ -49,18 +45,11 @@ public class MenuActivity extends AppCompatActivity {
 
         view2.setAdapter(adapterTab);
 
-        final String[] titles = new String[]{"Profesores","Alumnos","Detalles"};
+        final String[] titles = new String[]{"Profesores", "Alumnos", "Detalles"};
 
-        new TabLayoutMediator(tabLay,view2,
-                (tab,position) -> tab.setText(titles[position])
+        new TabLayoutMediator(tabLay, view2,
+                (tab, position) -> tab.setText(titles[position])
         ).attach();
-
-    }
-
-    public void menu(View view){
-
-
-        //txtBienvenida.setText("hola");
 
     }
 

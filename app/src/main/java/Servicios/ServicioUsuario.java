@@ -12,10 +12,8 @@ import Datos.AdminSQLiteOpenHelper;
 public class ServicioUsuario {
 
     protected Context context;
-    protected boolean estado;
     private AdminSQLiteOpenHelper usuario;
     private SQLiteDatabase base_Datos;
-    private ContentValues usuarioRegis = new ContentValues();
     public String rol;
 
     public ServicioUsuario (Context context){

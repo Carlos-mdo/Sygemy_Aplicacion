@@ -29,18 +29,20 @@ public class AdminSQLiteOpenHelper extends SQLiteOpenHelper{
 
         BaseDeDatos.execSQL("CREATE TABLE profesores (" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "dni_prof TEXT UNIQUE NOT NULL," +
                 "nombre_prof TEXT NOT NULL," +
                 "apellido_prof TEXT NOT NULL," +
-                "rol_prof TEXT," +
+                "genero_prof TEXT," + // todavia no implementado en la plantilla profesores
                 "materia TEXT," +
                 "usuario_id INTEGER," +
                 "FOREIGN KEY(usuario_id) REFERENCES usuarios(id))");
 
         BaseDeDatos.execSQL("CREATE TABLE alumnos ("+
                 "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "dni_alum TEXT UNIQUE NOT NULL," +
                 "nombre_alum TEXT NOT NULL," +
                 "apellido_alum TEXT NOT NULL," +
-                "rol_alum TEXT," +
+                "genero_alum TEXT," +
                 "usuario_id INTEGER," +
                 "FOREIGN KEY(usuario_id) REFERENCES usuarios(id))");
     }

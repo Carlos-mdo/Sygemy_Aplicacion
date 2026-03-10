@@ -26,7 +26,6 @@ public class MainActivity extends AppCompatActivity {
     ServicioUsuario servUsuario;
     public String rol;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,11 +37,10 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        servAdmin = new ServicioAdmin(this);
+//        servAdmin = new ServicioAdmin(this);
         servUsuario = new ServicioUsuario(this);
         etUsuario = findViewById(R.id.editTextUsuario);
         etContrasenia = findViewById(R.id.editTextContrasenia);
-
     }
 
     public boolean validaciones () {
@@ -65,31 +63,6 @@ public class MainActivity extends AppCompatActivity {
         return estado;
     }
 
-//    public void iniciarSesion(){
-//        AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this, "BD_Sygemy", null, 1);
-//        SQLiteDatabase baseDeDatos = admin.getWritableDatabase();
-//
-//        String _usuario = etUsuario.getText().toString();
-//        String _contrasenia = etContrasenia.getText().toString();
-//
-//        if(!_usuario.isEmpty() && ! _contrasenia.isEmpty()){
-//            ContentValues registrar = new ContentValues();
-//
-//            registrar.put("usuario", _usuario);
-//            registrar.put("contrasenia", _contrasenia);
-//
-//            baseDeDatos.insert("usuarios", null, registrar);
-//
-//            baseDeDatos.close();
-//
-//            etUsuario.setText("");
-//            etContrasenia.setText("");
-//
-//        } else {
-//            Toast.makeText(this, "Completar todos los campos", Toast.LENGTH_SHORT).show();
-//        }
-//    }
-
     public void btnIniciar (View view){
 
         if(!validaciones()){
@@ -108,8 +81,10 @@ public class MainActivity extends AppCompatActivity {
 
                 Intent intent = new Intent(this, ProfesorActivity.class);
                 startActivity(intent);
-            }
-            else
+            } else if (rol.equals("alumno")) {
+                Intent intent = new Intent(this, ProfesorActivity.class);
+                startActivity(intent);
+            } else
             {
                 Toast.makeText(this,"error al buscar el usuario",Toast.LENGTH_SHORT).show();
             }
@@ -118,8 +93,6 @@ public class MainActivity extends AppCompatActivity {
         {
             Toast.makeText(this,"Ningun dato fue recibido",Toast.LENGTH_SHORT).show();
         }
-
-        //iniciarSesion();
     }
 
 }

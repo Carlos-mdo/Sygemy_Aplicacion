@@ -1,8 +1,8 @@
 <resources>
-    <string name="app_name">Gestion_escolar</string>
+    <string name="app_name">Sygemy</string>
     <string name="menu_bienvenida">bienvenido</string>
     <string name="fragment_profesores">Plantilla de Profesores</string>
-    <string name="fragment_alumnos">Fragment de alumnos</string>
+    <string name="fragment_alumnos">Plantilla de alumnos</string>
     <string name="fragment_detalles">Fragment de detalles</string>
 
 </resources>
