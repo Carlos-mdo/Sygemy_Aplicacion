@@ -20,7 +20,6 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.aplicacion.gestion_escolar.MainActivity;
-import com.aplicacion.gestion_escolar.MenuActivity;
 import com.aplicacion.gestion_escolar.R;
 
 import Datos.AdminSQLiteOpenHelper;
@@ -34,9 +33,9 @@ public class Fragment_Alumnos extends Fragment {
     public ImageButton btnRegreso;
     protected AdminSQLiteOpenHelper datos;
     protected SQLiteDatabase baseDeDatos;
-    protected ContentValues valores = new ContentValues();
+    protected ContentValues contentValues = new ContentValues();
     public Boolean estado;
-
+    public ContentValues contentValuesEstudiantes = new ContentValues();
 
     public Fragment_Alumnos() {
     }
@@ -95,25 +94,28 @@ public class Fragment_Alumnos extends Fragment {
 
     public void guardarAlumno(){
 
-        valores.put("usuario",etUsuario.getText().toString());
-        valores.put("contrasenia",etContrasenia.getText().toString());
-        valores.put("rol","alumno");
+        contentValues.put("usuario",etUsuario.getText().toString());
+        contentValues.put("contrasenia",etContrasenia.getText().toString());
+        contentValues.put("rol","alumno");
 
-        baseDeDatos.insert("usuarios",null,valores);
+        long idUsuario = baseDeDatos.insert("usuarios",null, contentValues);
 
-        valores.put("dni_alum",etDni.getText().toString());
-        valores.put("nombre_alum",etNombre.getText().toString());
-        valores.put("apellido_alum",etContrasenia.getText().toString());
-        valores.put("genero_alum",spinnerGenero.getSelectedItem().toString());
+        contentValuesEstudiantes.put("dni_alum",etDni.getText().toString());
+        contentValuesEstudiantes.put("nombre_alum",etNombre.getText().toString());
+        contentValuesEstudiantes.put("apellido_alum",etApellido.getText().toString());
+        contentValuesEstudiantes.put("genero_alum",spinnerGenero.getSelectedItem().toString());
 
-        baseDeDatos.insert("alumnos",null,valores);
+        // vincular alumno con usuario
+        contentValuesEstudiantes.put("usuario_id",idUsuario);
+
+        baseDeDatos.insert("alumnos",null, contentValuesEstudiantes);
 
         etDni.setText("");
         etNombre.setText("");
         etApellido.setText("");
         etUsuario.setText("");
         etContrasenia.setText("");
-
+        spinnerGenero.setSelection(0);
         baseDeDatos.close();
     }
 
@@ -146,7 +148,10 @@ public class Fragment_Alumnos extends Fragment {
             etContrasenia.setError("Ingrese la contraseña del alumno");
             estado = false;
         }
-
+//        if(spinnerGenero.getSelectedItemPosition() == 0){
+//            Toast.makeText(getContext(), "Seleccione una opcion", Toast.LENGTH_SHORT).show();
+//            estado = false;
+//        }
         //Actualmente no existe un if para verificar el contenido del Spinner debido a errores constantes.
 
         return estado;
