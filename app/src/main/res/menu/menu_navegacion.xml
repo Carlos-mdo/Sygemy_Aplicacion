@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:id="@+id/grupo_todos">
+    <item android:id="@+id/nav_inicio"
+        android:title="Inicio"/>
+    <item android:id="@+id/nav_perfil"
+        android:title="Perfil"/>
+    <item android:id="@+id/nav_cerrar"
+        android:title="Cerrar sesión"/>
+    </group>
+    <group android:id="@+id/grupo_profesores">
+        <item android:id="@+id/nav_cursos"
+            android:title="Cursos"/>
+        <item android:id="@+id/nav_notas_prof"
+            android:title="Notas"/>
+    </group>
+    <group android:id="@+id/grupo_alumnos">
+        <item android:id="@+id/nav_notas_alum"
+            android:title="Mis Notas"/>
+        <item android:id="@+id/nav_horarios"
+            android:title="Horarios"/>
+        <item android:id="@+id/nav_materias"
+            android:title="Materias"/>
+    </group>
+</menu>
