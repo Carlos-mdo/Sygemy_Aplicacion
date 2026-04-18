@@ -12,10 +12,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Gestion_escolar">
         <activity
-            android:name=".ProfesorActivity"
+            android:name=".MenuUsuarioActivity"
             android:exported="false" />
         <activity
-            android:name=".MenuActivity"
+            android:name=".MenuAdminActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"

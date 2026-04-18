@@ -1,7 +1,9 @@
 package Ventana.Admin;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 
@@ -156,4 +158,5 @@ public class Fragment_Alumnos extends Fragment {
 
         return estado;
     }
+
 }

@@ -1,7 +1,9 @@
 package Ventana.Admin;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 
@@ -9,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -96,15 +99,14 @@ public class Fragment_Profesores extends Fragment {
 //            Toast.makeText(getContext(),"Complete todos los campos",Toast.LENGTH_SHORT).show();
 //        }
     }
-
-    public void guardarProfesor(){
+    public void guardarProfesor() {
 
         contentValues.clear();
         contentValuesProfe.clear();
 
-        contentValues.put("usuario",etUsuario.getText().toString());
-        contentValues.put("contrasenia",etContrasenia.getText().toString());
-        contentValues.put("rol","profesor");
+        contentValues.put("usuario", etUsuario.getText().toString());
+        contentValues.put("contrasenia", etContrasenia.getText().toString());
+        contentValues.put("rol", "profesor");
 
         long idUsuario = baseDeDatos.insert("usuarios",null,contentValues);
 

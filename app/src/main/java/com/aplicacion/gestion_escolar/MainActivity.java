@@ -1,12 +1,11 @@
 package com.aplicacion.gestion_escolar;
 
-import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -15,7 +14,6 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import Datos.AdminSQLiteOpenHelper;
 import Servicios.ServicioAdmin;
 import Servicios.ServicioUsuario;
 
@@ -74,25 +72,39 @@ public class MainActivity extends AppCompatActivity {
         if(rol!=null){
 
             if(rol.equals("admin")){
-                Intent intent = new Intent(this, MenuActivity.class);
+
+                Intent intent = new Intent(this, MenuAdminActivity.class);
                 startActivity(intent);
             }
             else if(rol.equals("profesor")){
 
-                Intent intent = new Intent(this, ProfesorActivity.class);
+                guardarRol("profe");
+                Intent intent = new Intent(this, MenuUsuarioActivity.class);
                 startActivity(intent);
-            } else if (rol.equals("alumno")) {
-                Intent intent = new Intent(this, ProfesorActivity.class);
+            }
+            else if (rol.equals("alumno")) {
+
+                guardarRol("alumn");
+                Intent intent = new Intent(this, MenuUsuarioActivity.class);
                 startActivity(intent);
-            } else
+            }
+            else
             {
                 Toast.makeText(this,"error al buscar el usuario",Toast.LENGTH_SHORT).show();
             }
-
         }else
         {
             Toast.makeText(this,"Ningun dato fue recibido",Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public void guardarRol(String rol){
+        SharedPreferences shPref = getSharedPreferences("Roles", Context.MODE_PRIVATE);
+
+        SharedPreferences.Editor edit = shPref.edit();
+        edit.clear();
+        edit.putString("rol", rol);
+        edit.apply();
     }
 
 }

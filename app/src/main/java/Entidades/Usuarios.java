@@ -15,6 +15,13 @@ public class Usuarios {
         this.rol = rol;
     }
 
+    public Usuarios(int id, String usuario, String contrasenia, String rol){
+        this.id = id;
+        this.usuario = usuario;
+        this.contrasenia = contrasenia;
+        this.rol = rol;
+    }
+
     public Usuarios(){}
     public ContentValues Valores() {
         ContentValues valores = new ContentValues();

@@ -4,5 +4,7 @@
     <string name="fragment_profesores">Plantilla de Profesores</string>
     <string name="fragment_alumnos">Plantilla de alumnos</string>
     <string name="fragment_detalles">Fragment de detalles</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

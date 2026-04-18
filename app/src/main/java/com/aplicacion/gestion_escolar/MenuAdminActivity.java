@@ -1,11 +1,6 @@
 package com.aplicacion.gestion_escolar;
 
-import android.annotation.SuppressLint;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.EditText;
-import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,9 +13,8 @@ import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
 import Adapter.TabAdapter;
-import Datos.AdminSQLiteOpenHelper;
 
-public class MenuActivity extends AppCompatActivity {
+public class MenuAdminActivity extends AppCompatActivity {
 
     public TabLayout tabLay;
     public ViewPager2 view2;

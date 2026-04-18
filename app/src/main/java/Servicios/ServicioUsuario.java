@@ -24,7 +24,6 @@ public class ServicioUsuario {
 
     public String buscarUsuario(String etUsuario, String etContrasenia) {
 
-
         Cursor cursor = base_Datos.rawQuery(
                 "SELECT * FROM usuarios WHERE usuario=? AND contrasenia=?",
                 new String[]{etUsuario, etContrasenia}
@@ -40,6 +39,5 @@ public class ServicioUsuario {
 
         return rol;
     }
-
 
 }
