@@ -4,10 +4,39 @@
     android:layout_height="match_parent"
     tools:context="Ventana.Profesor.Fragment_Calificaciones">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:orientation="vertical"
+        android:padding="30dp">
+
+        <Spinner
+            android:id="@+id/spinnerCurso"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <Spinner
+            android:id="@+id/spinnerAlumno"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <Spinner
+            android:id="@+id/spinnerTrimestre"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <ListView
+            android:id="@+id/listNotas"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+
+        <Button
+            android:id="@+id/btnAgregarNota"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Agregar Nota"/>
+
+    </LinearLayout>
 
 </FrameLayout>

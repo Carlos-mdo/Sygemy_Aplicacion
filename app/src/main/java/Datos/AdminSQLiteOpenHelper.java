@@ -42,9 +42,31 @@ public class AdminSQLiteOpenHelper extends SQLiteOpenHelper{
                 "dni_alum TEXT UNIQUE NOT NULL," +
                 "nombre_alum TEXT NOT NULL," +
                 "apellido_alum TEXT NOT NULL," +
+                "curso_alum TEXT NOT NULL," +
                 "genero_alum TEXT," +
                 "usuario_id INTEGER," +
                 "FOREIGN KEY(usuario_id) REFERENCES usuarios(id))");
+
+        BaseDeDatos.execSQL("CREATE TABLE trimestres (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "nombre TEXT NOT NULL," +
+                "fecha_inicio TEXT," +
+                "fecha_fin TEXT)");
+
+        BaseDeDatos.execSQL("CREATE TABLE calificaciones (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "alumno_id INTEGER NOT NULL," +
+                "trimestre_id INTEGER NOT NULL," +
+                "descripcion TEXT," +
+                "nota REAL NOT NULL," +
+                "fecha TEXT," +
+                "FOREIGN KEY(alumno_id) REFERENCES alumnos(id)," +
+                "FOREIGN KEY(trimestre_id) REFERENCES trimestres(id))");
+
+        BaseDeDatos.execSQL("INSERT INTO trimestres (nombre) VALUES ('1° Trimestre')");
+        BaseDeDatos.execSQL("INSERT INTO trimestres (nombre) VALUES ('2° Trimestre')");
+        BaseDeDatos.execSQL("INSERT INTO trimestres (nombre) VALUES ('3° Trimestre')");
+
     }
 
     @Override
@@ -52,6 +74,8 @@ public class AdminSQLiteOpenHelper extends SQLiteOpenHelper{
         BaseDeDatos.execSQL("DROP TABLE IF EXISTS usuarios");
         BaseDeDatos.execSQL("DROP TABLE IF EXISTS profesores");
         BaseDeDatos.execSQL("DROP TABLE IF EXISTS alumnos");
+        BaseDeDatos.execSQL("DROP TABLE IF EXISTS calificaciones");
+        BaseDeDatos.execSQL("DROP TABLE IF EXISTS trimestres");
         onCreate(BaseDeDatos);
     }
 }

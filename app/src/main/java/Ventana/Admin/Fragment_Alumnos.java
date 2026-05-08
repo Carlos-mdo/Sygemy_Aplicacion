@@ -1,9 +1,7 @@
 package Ventana.Admin;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 
@@ -28,30 +26,15 @@ import Datos.AdminSQLiteOpenHelper;
 
 public class Fragment_Alumnos extends Fragment {
 
-    public String[] generos = {"Seleccionar","Femenino","Masculino"};
+    public String[] generos = {"Seleccionar", "Femenino", "Masculino"};
     public Spinner spinnerGenero;
-    public EditText etDni,etNombre,etApellido,etUsuario, etContrasenia;
+    public EditText etDni, etNombre, etApellido, etUsuario, etContrasenia, etCurso;
     public Button btnGuardado;
     public ImageButton btnRegreso;
     protected AdminSQLiteOpenHelper datos;
     protected SQLiteDatabase baseDeDatos;
-    protected ContentValues contentValues = new ContentValues();
-    public Boolean estado;
-    public ContentValues contentValuesEstudiantes = new ContentValues();
 
-    public Fragment_Alumnos() {
-    }
-    public static Fragment_Alumnos newInstance(String param1, String param2) {
-        Fragment_Alumnos fragment = new Fragment_Alumnos();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
+    public Fragment_Alumnos() {}
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -63,100 +46,134 @@ public class Fragment_Alumnos extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        datos = new AdminSQLiteOpenHelper(requireContext(),"BD_Sygemy",null,1);
+        datos = new AdminSQLiteOpenHelper(requireContext(), "BD_Sygemy", null, 1);
         baseDeDatos = datos.getWritableDatabase();
 
-        etDni = view.findViewById(R.id.etDniAlum);
-        etNombre = view.findViewById(R.id.etNombreAlum);
-        etApellido = view.findViewById(R.id.etApellidoAlum);
-        etUsuario = view.findViewById(R.id.etUsuarioAlum);
-        etContrasenia = view.findViewById(R.id.etContraseniaAlum);
-        spinnerGenero = view.findViewById(R.id.spinGenero);
+        etDni        = view.findViewById(R.id.etDniAlum);
+        etNombre     = view.findViewById(R.id.etNombreAlum);
+        etApellido   = view.findViewById(R.id.etApellidoAlum);
+        etUsuario    = view.findViewById(R.id.etUsuarioAlum);
+        etContrasenia= view.findViewById(R.id.etContraseniaAlum);
+        etCurso      = view.findViewById(R.id.etCurso);
+        spinnerGenero= view.findViewById(R.id.spinGenero);
+        btnGuardado  = view.findViewById(R.id.btnAgregarAlum);
+        btnRegreso   = view.findViewById(R.id.btnRegresoAlum);
 
-        btnGuardado = view.findViewById(R.id.btnAgregarAlum);
-        btnRegreso = view.findViewById(R.id.btnRegresoAlum);
+        ArrayAdapter<String> adapterGenero = new ArrayAdapter<>(
+                requireContext(),
+                android.R.layout.simple_spinner_item,
+                generos
+        );
 
-        ArrayAdapter<String> array = new ArrayAdapter<String>(requireContext(), android.R.layout.simple_spinner_item,generos);
+        adapterGenero.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerGenero.setAdapter(adapterGenero);
 
-        array.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        btnGuardado.setOnClickListener(v -> {
+            if (validacionAlumnos()) {
+                guardarAlumno();
+            }
+        });
 
-        spinnerGenero.setAdapter(array);
-
-        btnGuardado.setOnClickListener(view1 -> guardarAlumno());
-        Intent intent = new Intent(getContext(), MainActivity.class);
-
-        btnRegreso.setOnClickListener(view1 -> startActivity(intent));
-
-        if(!validacionAlumnos()){
-            return;
-        }else{
-            Toast.makeText(getContext(),"Complete todos los campos",Toast.LENGTH_SHORT).show();
-        }
+        btnRegreso.setOnClickListener(v -> {
+            Intent intent = new Intent(getContext(), MainActivity.class);
+            startActivity(intent);
+        });
     }
 
-    public void guardarAlumno(){
+    public void guardarAlumno() {
 
-        contentValues.put("usuario",etUsuario.getText().toString());
-        contentValues.put("contrasenia",etContrasenia.getText().toString());
-        contentValues.put("rol","alumno");
+        ContentValues valorUsuario = new ContentValues();
+        valorUsuario.put("usuario", etUsuario.getText().toString().trim());
+        valorUsuario.put("contrasenia",etContrasenia.getText().toString().trim());
+        valorUsuario.put("rol", "alumno");
 
-        long idUsuario = baseDeDatos.insert("usuarios",null, contentValues);
+        long idUsuario = baseDeDatos.insert("usuarios", null, valorUsuario);
 
-        contentValuesEstudiantes.put("dni_alum",etDni.getText().toString());
-        contentValuesEstudiantes.put("nombre_alum",etNombre.getText().toString());
-        contentValuesEstudiantes.put("apellido_alum",etApellido.getText().toString());
-        contentValuesEstudiantes.put("genero_alum",spinnerGenero.getSelectedItem().toString());
+        if (idUsuario == -1) {
+            Toast.makeText(getContext(),
+                    "El nombre de usuario ya está en uso", Toast.LENGTH_SHORT).show();
+            etUsuario.setError("Usuario ya registrado");
+            return;
+        }
 
-        // vincular alumno con usuario
-        contentValuesEstudiantes.put("usuario_id",idUsuario);
+        ContentValues valorAlumno = new ContentValues();
+        valorAlumno.put("dni_alum",    etDni.getText().toString().trim());
+        valorAlumno.put("nombre_alum", etNombre.getText().toString().trim());
+        valorAlumno.put("apellido_alum",etApellido.getText().toString().trim());
+        valorAlumno.put("curso_alum",  etCurso.getText().toString().trim());
+        valorAlumno.put("genero_alum", spinnerGenero.getSelectedItem().toString());
+        valorAlumno.put("usuario_id",  idUsuario);
 
-        baseDeDatos.insert("alumnos",null, contentValuesEstudiantes);
+        long idAlumno = baseDeDatos.insert("alumnos", null, valorAlumno);
+
+        if (idAlumno == -1) {
+            Toast.makeText(getContext(),
+                    "El DNI ya está registrado", Toast.LENGTH_SHORT).show();
+            etDni.setError("DNI ya registrado");
+            baseDeDatos.delete("usuarios", "id = ?",
+                    new String[]{ String.valueOf(idUsuario) });
+            return;
+        }
+
+        Toast.makeText(getContext(), "Alumno guardado correctamente ✓", Toast.LENGTH_SHORT).show();
 
         etDni.setText("");
         etNombre.setText("");
         etApellido.setText("");
         etUsuario.setText("");
         etContrasenia.setText("");
+        etCurso.setText("");
         spinnerGenero.setSelection(0);
-        baseDeDatos.close();
     }
 
-    public boolean validacionAlumnos(){
-        estado = true;
+    public boolean validacionAlumnos() {
 
         etDni.setError(null);
         etNombre.setError(null);
         etApellido.setError(null);
         etUsuario.setError(null);
         etContrasenia.setError(null);
+        etCurso.setError(null);
 
-        if(etDni.getText().toString().isEmpty()){
+        boolean valido = true;
+
+        if (etDni.getText().toString().trim().isEmpty()) {
             etDni.setError("Ingrese el DNI");
-            estado = false;
+            valido = false;
         }
-        if(etNombre.getText().toString().isEmpty()){
-            etNombre.setError("Ingrese el nombre del alumno");
-            estado = false;
+        if (etNombre.getText().toString().trim().isEmpty()) {
+            etNombre.setError("Ingrese el nombre");
+            valido = false;
         }
-        if(etApellido.getText().toString().isEmpty()){
-            etApellido.setError("Ingrese el apellido del alumno");
-            estado = false;
+        if (etApellido.getText().toString().trim().isEmpty()) {
+            etApellido.setError("Ingrese el apellido");
+            valido = false;
         }
-        if(etUsuario.getText().toString().isEmpty()){
-            etUsuario.setError("Ingrese el usuario del alumno");
-            estado = false;
+        if (etCurso.getText().toString().trim().isEmpty()) {
+            etCurso.setError("Ingrese el curso");
+            valido = false;
         }
-        if(etContrasenia.getText().toString().isEmpty()){
-            etContrasenia.setError("Ingrese la contraseña del alumno");
-            estado = false;
+        if (etUsuario.getText().toString().trim().isEmpty()) {
+            etUsuario.setError("Ingrese el usuario");
+            valido = false;
         }
-//        if(spinnerGenero.getSelectedItemPosition() == 0){
-//            Toast.makeText(getContext(), "Seleccione una opcion", Toast.LENGTH_SHORT).show();
-//            estado = false;
-//        }
-        //Actualmente no existe un if para verificar el contenido del Spinner debido a errores constantes.
+        if (etContrasenia.getText().toString().trim().isEmpty()) {
+            etContrasenia.setError("Ingrese la contraseña");
+            valido = false;
+        }
+        if (spinnerGenero.getSelectedItemPosition() == 0) {
+            Toast.makeText(getContext(), "Seleccione un género", Toast.LENGTH_SHORT).show();
+            valido = false;
+        }
 
-        return estado;
+        return valido;
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (baseDeDatos != null && baseDeDatos.isOpen()) {
+            baseDeDatos.close();
+        }
+    }
 }
