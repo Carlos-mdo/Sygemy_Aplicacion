@@ -21,10 +21,11 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.material.navigation.NavigationView;
 
+import Ventana.Profesor.Fragment_Actividad;
 import Ventana.Profesor.Fragment_Calificaciones;
 import Ventana.Profesor.Fragment_Correciones;
 
-public class MenuUsuarioActivity extends AppCompatActivity {
+public class MenuUsuarioActivity extends AppCompatActivity implements ControllerDrawerMenu{
 
     private ImageButton btnDesplegar;
     private DrawerLayout drawLayout;
@@ -71,13 +72,18 @@ public class MenuUsuarioActivity extends AppCompatActivity {
 
     public void desplegarMenu() {
         if (drawLayout.isDrawerOpen(GravityCompat.START)) {
-            drawLayout.closeDrawer(GravityCompat.START);
+            cerrarNav();
+            //drawLayout.closeDrawer(GravityCompat.START);
         } else {
-            drawLayout.openDrawer(GravityCompat.START);
+            abrirNav();
+           // drawLayout.openDrawer(GravityCompat.START);
         }
     }
 
     public void seleccionMenu(){
+        SharedPreferences spref = getSharedPreferences("Roles", Context.MODE_PRIVATE);
+        String rol = spref.getString("rol","");
+
         naView.setNavigationItemSelectedListener(item -> {
 
             if(item.getItemId() == R.id.nav_inicio){
@@ -95,6 +101,16 @@ public class MenuUsuarioActivity extends AppCompatActivity {
 
                 return true;
             }
+
+            if(rol.equals("profe")){//Acceso de los fragment profesores
+
+                if(item.getItemId() == R.id.nav_actividad){
+                    cargarFragment(new Fragment_Actividad());
+                    return true;
+                }
+
+            }
+
 
             if(item.getItemId() == R.id.nav_cerrar){
 
@@ -121,5 +137,14 @@ public class MenuUsuarioActivity extends AppCompatActivity {
         menu.setGroupVisible(R.id.grupo_profesores, rol.equals("profe"));
         menu.setGroupVisible(R.id.grupo_alumnos, rol.equals("alumn"));
 
+    }
+
+    @Override
+    public void abrirNav() {
+        drawLayout.openDrawer(GravityCompat.START);
+    }
+    @Override
+    public void cerrarNav() {
+        drawLayout.closeDrawer(GravityCompat.START);
     }
 }

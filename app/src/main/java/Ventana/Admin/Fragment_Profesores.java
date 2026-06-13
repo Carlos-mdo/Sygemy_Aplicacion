@@ -87,17 +87,18 @@ public class Fragment_Profesores extends Fragment {
         btnGuardar = view.findViewById(R.id.btnAgregarProfe);
         btnRegreso = view.findViewById(R.id.btnRegresoProfe);
 
-        btnGuardar.setOnClickListener(view1 -> guardarProfesor());
+        //btnGuardar.setOnClickListener(view1 -> guardarProfesor());
 
         Intent intent = new Intent(requireContext(), MainActivity.class);
 
         btnRegreso.setOnClickListener(view1 -> startActivity(intent));
 
-//        if(!ValidacionProfesores()){
-//            return;
-//        }else{
-//            Toast.makeText(getContext(),"Complete todos los campos",Toast.LENGTH_SHORT).show();
-//        }
+        btnGuardar.setOnClickListener(view1 -> {
+            if(ValidacionProfesores()){
+                guardarProfesor();
+            }
+        });
+
     }
     public void guardarProfesor() {
 
@@ -133,42 +134,48 @@ public class Fragment_Profesores extends Fragment {
 
     }
 
-//    public boolean ValidacionProfesores(){
-//        estado = true;
-//
-//        etDni.setError(null);
-//        etNombre.setError(null);
-//        etApellido.setError(null);
-//        etUsuario.setError(null);
-//        etContrasenia.setError(null);
-//
-//        if(etDni.getText().toString().isEmpty()){
-//            etDni.setError("Ingrese el DNI");
-//            estado = false;
-//        }
-//        if(etNombre.getText().toString().isEmpty()){
-//            etNombre.setError("Ingrese el nombre del profesor");
-//            estado = false;
-//        }
-//        if(etApellido.getText().toString().isEmpty()){
-//            etApellido.setError("Ingrese el apellido del profesor");
-//            estado = false;
-//        }
-//        if(etUsuario.getText().toString().isEmpty()){
-//            etUsuario.setError("Ingrese el usuario del profesor");
-//            estado = false;
-//        }
-//        if(etContrasenia.getText().toString().isEmpty()){
-//            etContrasenia.setError("Ingrese la contraseña del profesor");
-//            estado = false;
-//        }
-//        if(spinnerGenero.getSelectedItemPosition() == 0){
-//           txtErrorGenero.setError("Ingrese un genero");
-//            estado = false;
-//        }
-//
-//
-//        return estado;
-//    }
+    public boolean ValidacionProfesores(){
+        estado = true;
 
+        etDni.setError(null);
+        etNombre.setError(null);
+        etApellido.setError(null);
+        etUsuario.setError(null);
+        etContrasenia.setError(null);
+
+        if(etDni.getText().toString().trim().isEmpty()){
+            etDni.setError("Ingrese el DNI");
+            estado = false;
+        }
+        if(etNombre.getText().toString().trim().isEmpty()){
+            etNombre.setError("Ingrese el nombre del profesor");
+            estado = false;
+        }
+        if(etApellido.getText().toString().trim().isEmpty()){
+            etApellido.setError("Ingrese el apellido del profesor");
+            estado = false;
+        }
+        if(etUsuario.getText().toString().trim().isEmpty()){
+            etUsuario.setError("Ingrese el usuario del profesor");
+            estado = false;
+        }
+        if(etContrasenia.getText().toString().trim().isEmpty()){
+            etContrasenia.setError("Ingrese la contraseña del profesor");
+            estado = false;
+        }
+        if(spinnerGenero.getSelectedItemPosition() == 0){
+            Toast.makeText(getContext(), "Seleccione un género", Toast.LENGTH_SHORT).show();
+            estado = false;
+        }
+
+        return estado;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (baseDeDatos !=null && baseDeDatos.isOpen()){
+            baseDeDatos.close();
+        }
+    }
 }
