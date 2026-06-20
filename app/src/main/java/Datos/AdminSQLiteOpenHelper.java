@@ -35,6 +35,7 @@ public class AdminSQLiteOpenHelper extends SQLiteOpenHelper{
                 "genero_prof TEXT," + // todavia no implementado en la plantilla profesores
                 "materia TEXT," +
                 "usuario_id INTEGER," +
+                "sueldo_id MONEY," +
                 "FOREIGN KEY(usuario_id) REFERENCES usuarios(id))");
 
         BaseDeDatos.execSQL("CREATE TABLE alumnos ("+

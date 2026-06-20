@@ -1,5 +1,6 @@
 package Ventana.Admin;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -11,7 +12,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 
+import com.aplicacion.gestion_escolar.MenuAdminActivity;
 import com.aplicacion.gestion_escolar.R;
 
 import java.util.List;
@@ -20,20 +23,21 @@ import Adapter.UsuarioAdapter;
 import Entidades.Usuarios;
 import Servicios.ServicioAdmin;
 
-public class Fragment_Detalles extends Fragment {
+public class Fragment_DetalleUsuarios extends Fragment {
 
     private ServicioAdmin servicioAdmin;
     private List<Usuarios> listUsuarios;
     private RecyclerView recyclerUsuarios;
+    private ImageButton btnRegreso;
 
-    public Fragment_Detalles() {
+    public Fragment_DetalleUsuarios() {
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        return inflater.inflate(R.layout.fragment__detalles, container, false);
+        return inflater.inflate(R.layout.fragment__detalleusuarios, container, false);
     }
 
     @Override
@@ -51,5 +55,12 @@ public class Fragment_Detalles extends Fragment {
         UsuarioAdapter adapter = new UsuarioAdapter(listUsuarios, servicioAdmin);
 
         recyclerUsuarios.setAdapter(adapter);
+
+        btnRegreso = view.findViewById(R.id.btnRegresoDetalles);
+
+        btnRegreso.setOnClickListener(v -> {
+            Intent intent = new Intent(requireContext(), MenuAdminActivity.class);
+            startActivity(intent);
+        });
     }
 }

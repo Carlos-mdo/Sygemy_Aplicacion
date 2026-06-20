@@ -24,6 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.aplicacion.gestion_escolar.MainActivity;
+import com.aplicacion.gestion_escolar.MenuAdminActivity;
 import com.aplicacion.gestion_escolar.R;
 
 import Datos.AdminSQLiteOpenHelper;
@@ -89,9 +90,11 @@ public class Fragment_Profesores extends Fragment {
 
         //btnGuardar.setOnClickListener(view1 -> guardarProfesor());
 
-        Intent intent = new Intent(requireContext(), MainActivity.class);
-
-        btnRegreso.setOnClickListener(view1 -> startActivity(intent));
+        btnRegreso.setOnClickListener(v -> {
+            baseDeDatos.close();
+            Intent intent = new Intent(requireContext(), MenuAdminActivity.class);
+            startActivity(intent);
+        });
 
         btnGuardar.setOnClickListener(view1 -> {
             if(ValidacionProfesores()){
@@ -111,8 +114,6 @@ public class Fragment_Profesores extends Fragment {
 
         long idUsuario = baseDeDatos.insert("usuarios",null,contentValues);
 
-        baseDeDatos.insert("usuarios",null,contentValues);
-
         contentValuesProfe.put("dni_prof",etDni.getText().toString());
         contentValuesProfe.put("nombre_prof",etNombre.getText().toString());
         contentValuesProfe.put("apellido_prof",etApellido.getText().toString());
@@ -129,8 +130,6 @@ public class Fragment_Profesores extends Fragment {
         etDni.setText("");
         etMateria.setText("");
         spinnerGenero.setSelection(0);
-
-        baseDeDatos.close();
 
     }
 

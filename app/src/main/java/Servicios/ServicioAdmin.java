@@ -13,6 +13,7 @@ import java.util.List;
 
 import Datos.AdminSQLiteOpenHelper;
 import Entidades.Usuarios;
+import Entidades.Profesor;
 
 public class ServicioAdmin {
         protected Context context;
@@ -62,8 +63,62 @@ public class ServicioAdmin {
 
         return listaUsuarios;
     }
+
+    public List<Profesor> BuscarTodosProfesores() {
+
+        List<Profesor> listaProfesores = new ArrayList<>();
+
+        Cursor cursor = base_Datos.rawQuery("SELECT * FROM profesores", null);
+
+        if (cursor.moveToFirst()) {
+            do {
+
+                int id = cursor.getInt(
+                        cursor.getColumnIndexOrThrow("id"));
+
+                String dni = cursor.getString(
+                        cursor.getColumnIndexOrThrow("dni_prof"));
+
+                String nombre = cursor.getString(
+                        cursor.getColumnIndexOrThrow("nombre_prof"));
+
+                String apellido = cursor.getString(
+                        cursor.getColumnIndexOrThrow("apellido_prof"));
+
+                String genero = cursor.getString(
+                        cursor.getColumnIndexOrThrow("genero_prof"));
+
+                String materia = cursor.getString(
+                        cursor.getColumnIndexOrThrow("materia"));
+
+                int usuarioId = cursor.getInt(
+                        cursor.getColumnIndexOrThrow("usuario_id"));
+
+                Profesor profesor = new Profesor(
+                        id,
+                        dni,
+                        nombre,
+                        apellido,
+                        genero,
+                        materia,
+                        usuarioId
+                );
+
+                listaProfesores.add(profesor);
+
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+
+        return listaProfesores;
+    }
     public void eliminarUsuario(int id) {
         base_Datos.delete("usuarios", "id = ?",
+                new String[]{String.valueOf(id)});
+        base_Datos.delete("profesores", "usuario_id = ?",
+                new String[]{String.valueOf(id)});
+        base_Datos.delete("alumnos", "usuario_id = ?",
                 new String[]{String.valueOf(id)});
     }
 

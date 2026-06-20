@@ -71,26 +71,31 @@ public class MainActivity extends AppCompatActivity {
 
         if(rol!=null){
 
-            if(rol.equals("admin")){
+            switch (rol) {
+                case "admin": {
 
-                Intent intent = new Intent(this, MenuAdminActivity.class);
-                startActivity(intent);
-            }
-            else if(rol.equals("profesor")){
+//                    guardarRol("admin");
+                    Intent intent = new Intent(this, MenuAdminActivity.class);
+                    startActivity(intent);
+                    break;
+                }
+                case "profesor": {
 
-                guardarRol("profe");
-                Intent intent = new Intent(this, MenuUsuarioActivity.class);
-                startActivity(intent);
-            }
-            else if (rol.equals("alumno")) {
+                    guardarRol("profe");
+                    Intent intent = new Intent(this, MenuUsuarioActivity.class);
+                    startActivity(intent);
+                    break;
+                }
+                case "alumno": {
 
-                guardarRol("alumn");
-                Intent intent = new Intent(this, MenuUsuarioActivity.class);
-                startActivity(intent);
-            }
-            else
-            {
-                Toast.makeText(this,"error al buscar el usuario",Toast.LENGTH_SHORT).show();
+                    guardarRol("alumno");
+                    Intent intent = new Intent(this, MenuUsuarioActivity.class);
+                    startActivity(intent);
+                    break;
+                }
+                default:
+                    Toast.makeText(this, "error al buscar el usuario", Toast.LENGTH_SHORT).show();
+                    break;
             }
         }else
         {

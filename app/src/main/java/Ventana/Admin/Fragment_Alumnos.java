@@ -20,6 +20,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.aplicacion.gestion_escolar.MainActivity;
+import com.aplicacion.gestion_escolar.MenuAdminActivity;
 import com.aplicacion.gestion_escolar.R;
 
 import Datos.AdminSQLiteOpenHelper;
@@ -75,7 +76,8 @@ public class Fragment_Alumnos extends Fragment {
         });
 
         btnRegreso.setOnClickListener(v -> {
-            Intent intent = new Intent(getContext(), MainActivity.class);
+            baseDeDatos.close();
+            Intent intent = new Intent(requireContext(), MenuAdminActivity.class);
             startActivity(intent);
         });
     }
@@ -89,13 +91,6 @@ public class Fragment_Alumnos extends Fragment {
 
         long idUsuario = baseDeDatos.insert("usuarios", null, valorUsuario);
 
-        if (idUsuario == -1) {
-            Toast.makeText(getContext(),
-                    "El nombre de usuario ya está en uso", Toast.LENGTH_SHORT).show();
-            etUsuario.setError("Usuario ya registrado");
-            return;
-        }
-
         ContentValues valorAlumno = new ContentValues();
         valorAlumno.put("dni_alum",    etDni.getText().toString().trim());
         valorAlumno.put("nombre_alum", etNombre.getText().toString().trim());
@@ -106,14 +101,14 @@ public class Fragment_Alumnos extends Fragment {
 
         long idAlumno = baseDeDatos.insert("alumnos", null, valorAlumno);
 
-        if (idAlumno == -1) {
-            Toast.makeText(getContext(),
-                    "El DNI ya está registrado", Toast.LENGTH_SHORT).show();
-            etDni.setError("DNI ya registrado");
-            baseDeDatos.delete("usuarios", "id = ?",
-                    new String[]{ String.valueOf(idUsuario) });
-            return;
-        }
+//        if (idAlumno == -1) {
+//            Toast.makeText(getContext(),
+//                    "El DNI ya está registrado", Toast.LENGTH_SHORT).show();
+//            etDni.setError("DNI ya registrado");
+//            baseDeDatos.delete("usuarios", "id = ?",
+//                    new String[]{ String.valueOf(idUsuario) });
+//            return;
+//        }
 
         Toast.makeText(getContext(), "Alumno guardado correctamente ✓", Toast.LENGTH_SHORT).show();
 
