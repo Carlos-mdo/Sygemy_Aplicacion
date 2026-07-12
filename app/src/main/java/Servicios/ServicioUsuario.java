@@ -40,7 +40,6 @@ public class ServicioUsuario {
         } else {
             rol = null;
         }
-
         cursor.close();
         return usuarioEncontrado;
     }
