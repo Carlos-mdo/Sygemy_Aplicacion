@@ -1,66 +1,72 @@
 package Ventana.Alumno;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
-
 import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
+
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.aplicacion.gestion_escolar.R;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link Fragment_Horarios#newInstance} factory method to
- * create an instance of this fragment.
- */
+import java.util.List;
+
+import Adapter.HoraAdapter;
+import Datos.HorarioDao;
+import Datos.SesionDao;
+import Entidades.Horarios;
+
 public class Fragment_Horarios extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private RecyclerView recyclerHorarios;
+    private HoraAdapter adapter;
+    private HorarioDao horarioDAO;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public Fragment_Horarios() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment Fragment_Horarios.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static Fragment_Horarios newInstance(String param1, String param2) {
-        Fragment_Horarios fragment = new Fragment_Horarios();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
+    public Fragment_Horarios() { }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment__horarios, container, false);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment__horarios, container, false);
+
+        recyclerHorarios = view.findViewById(R.id.recyclerHorarios);
+        recyclerHorarios.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        horarioDAO = new HorarioDao(getContext());
+        cargarHorarios();
+
+        return view;
+    }
+
+    private void cargarHorarios() {
+        int usuarioId = SesionDao.getInstancia().getUsuarioId();
+
+        if (usuarioId == -1) {
+            Toast.makeText(getContext(), "No se encontró la sesión del alumno", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String curso = horarioDAO.obtenerCursoDeAlumno(usuarioId);
+        if (curso == null) {
+            Toast.makeText(getContext(), "No se encontró el curso del alumno", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        List<Horarios> lista = horarioDAO.obtenerHorariosPorCurso(curso);
+
+        if (lista.isEmpty()) {
+            Toast.makeText(getContext(), "No hay horarios cargados para tu curso", Toast.LENGTH_SHORT).show();
+        }
+
+        adapter = new HoraAdapter(lista);
+        recyclerHorarios.setAdapter(adapter);
     }
 }

@@ -21,6 +21,9 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.material.navigation.NavigationView;
 
+import Ventana.Alumno.Fragment_Horarios;
+import Ventana.Alumno.Fragment_Material;
+import Ventana.Alumno.Fragment_Notas;
 import Ventana.Profesor.Fragment_Actividad;
 import Ventana.Profesor.Fragment_Calificaciones;
 import Ventana.Profesor.Fragment_Correciones;
@@ -30,9 +33,8 @@ public class MenuUsuarioActivity extends AppCompatActivity implements Controller
     private ImageButton btnDesplegar;
     private DrawerLayout drawLayout;
     private NavigationView naView;
-    private String rolProf,rolAlum;
-    private View contenedorFragment;
-    private View scrollBienvenida;
+    private int id;
+    private View contenedorFragment, scrollBienvenida;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,9 +57,7 @@ public class MenuUsuarioActivity extends AppCompatActivity implements Controller
 
         seleccionMenu();
         roles();
-
     }
-
     private void cargarFragment(Fragment fragment) {
         contenedorFragment.setVisibility(View.VISIBLE);
         scrollBienvenida.setVisibility(View.GONE);
@@ -69,24 +69,22 @@ public class MenuUsuarioActivity extends AppCompatActivity implements Controller
 
         drawLayout.closeDrawer(GravityCompat.START);
     }
-
     public void desplegarMenu() {
         if (drawLayout.isDrawerOpen(GravityCompat.START)) {
             cerrarNav();
-            //drawLayout.closeDrawer(GravityCompat.START);
         } else {
             abrirNav();
-           // drawLayout.openDrawer(GravityCompat.START);
         }
     }
-
     public void seleccionMenu(){
         SharedPreferences spref = getSharedPreferences("Roles", Context.MODE_PRIVATE);
         String rol = spref.getString("rol","");
 
         naView.setNavigationItemSelectedListener(item -> {
 
-            if(item.getItemId() == R.id.nav_inicio){
+            id = item.getItemId();
+
+            if(id == R.id.nav_inicio){
 
                 Intent intent = new Intent(getBaseContext(), MenuUsuarioActivity.class);
                 startActivity(intent);
@@ -94,26 +92,37 @@ public class MenuUsuarioActivity extends AppCompatActivity implements Controller
                 finish();
                 return true;
             }
+            if(rol.equals("profe")){
 
-            if(item.getItemId() == R.id.nav_calificaciones){
-
-                cargarFragment(new Fragment_Calificaciones());
-
-                return true;
-            }
-
-            if(rol.equals("profe")){//Acceso de los fragment profesores
-
-                if(item.getItemId() == R.id.nav_actividad){
+                if(id == R.id.nav_actividad){
                     cargarFragment(new Fragment_Actividad());
                     return true;
                 }
-
+                if(id == R.id.nav_calificaciones){
+                    cargarFragment(new Fragment_Calificaciones());
+                    return true;
+                }
+                if(id == R.id.nav_correciones){
+                    cargarFragment(new Fragment_Correciones());
+                    return true;
+                }
             }
+            if(rol.equals("alumn")){
 
-
-            if(item.getItemId() == R.id.nav_cerrar){
-
+                if(id == R.id.nav_material){
+                    cargarFragment(new Fragment_Material());
+                    return true;
+                }
+                if(id == R.id.nav_horario){
+                    cargarFragment(new Fragment_Horarios());
+                    return true;
+                }
+                if(id == R.id.nav_notas){
+                    cargarFragment(new Fragment_Notas());
+                    return true;
+                }
+            }
+            if(id == R.id.nav_cerrar){
                 Intent intent = new Intent(getBaseContext(), MainActivity.class);
                 startActivity(intent);
 
@@ -136,6 +145,7 @@ public class MenuUsuarioActivity extends AppCompatActivity implements Controller
 
         menu.setGroupVisible(R.id.grupo_profesores, rol.equals("profe"));
         menu.setGroupVisible(R.id.grupo_alumnos, rol.equals("alumn"));
+        menu.setGroupVisible(R.id.grupo_admin, rol.equals("admin"));
 
     }
 

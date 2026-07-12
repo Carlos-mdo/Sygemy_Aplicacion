@@ -4,10 +4,24 @@
     android:layout_height="match_parent"
     tools:context="Ventana.Alumno.Fragment_Notas">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:orientation="vertical"
+        android:padding="30dp">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvCalificacionAlumno"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <TextView
+            android:id="@+id/txtSinCalificacion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Todavía no tenés notas cargadas"
+            android:visibility="gone" />
+
+    </LinearLayout>
 
 </FrameLayout>

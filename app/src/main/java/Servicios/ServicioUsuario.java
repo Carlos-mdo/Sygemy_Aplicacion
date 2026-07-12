@@ -1,13 +1,12 @@
 package Servicios;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.widget.EditText;
-import android.widget.Toast;
 
 import Datos.AdminSQLiteOpenHelper;
+import Entidades.Usuarios;
+
 
 public class ServicioUsuario {
 
@@ -22,22 +21,28 @@ public class ServicioUsuario {
         base_Datos = usuario.getWritableDatabase();
     }
 
-    public String buscarUsuario(String etUsuario, String etContrasenia) {
+    public Usuarios buscarUsuario(String etUsuario, String etContrasenia) {
 
         Cursor cursor = base_Datos.rawQuery(
                 "SELECT * FROM usuarios WHERE usuario=? AND contrasenia=?",
                 new String[]{etUsuario, etContrasenia}
         );
 
+        Usuarios usuarioEncontrado = null;
         if (cursor.moveToFirst()) {
-            rol = cursor.getString(3);
-        }else{
+            int id = cursor.getInt(0);
+            String usuario = cursor.getString(1);
+            String contrasenia = cursor.getString(2);
+            String rolEncontrado = cursor.getString(3);
+
+            usuarioEncontrado = new Usuarios(id, usuario, contrasenia, rolEncontrado);
+            rol = rolEncontrado;
+        } else {
             rol = null;
         }
 
         cursor.close();
-
-        return rol;
+        return usuarioEncontrado;
     }
 
 }

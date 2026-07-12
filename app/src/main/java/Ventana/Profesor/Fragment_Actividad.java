@@ -1,29 +1,70 @@
 package Ventana.Profesor;
 
+import android.content.ContentResolver;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
-import androidx.fragment.app.Fragment;
+
+import android.provider.OpenableColumns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.aplicacion.gestion_escolar.FragmentBase;
 import com.aplicacion.gestion_escolar.R;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import Datos.ActividadDao;
+import Datos.AdminSQLiteOpenHelper;
+import Entidades.Actividad;
+
 public class Fragment_Actividad extends FragmentBase {
 
     public Fragment_Actividad() {}
     private Button btnDesplegar;
+    private Uri archiUrl;
+    private String archiNombre;
+    private ActivityResultLauncher<String> selectArchi;
+    private AdminSQLiteOpenHelper admin;
+    private LinearLayout layoutArchiSelec;
+    private TextView tvNombreArchivo;
+    private String materia_profe;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        selectArchi = registerForActivityResult(
+                new ActivityResultContracts.GetContent(),
+                uri -> {
+                    if (uri != null) {
+                        archiUrl    = uri;
+                        archiNombre = obtenNomArchiv(uri);
+
+                        if (tvNombreArchivo != null && layoutArchiSelec != null) {
+                            tvNombreArchivo.setText(archiNombre);
+                            layoutArchiSelec.setVisibility(View.VISIBLE);
+                        }
+                    }
+                }
+        );
     }
 
     @Override
@@ -32,6 +73,7 @@ public class Fragment_Actividad extends FragmentBase {
 
         btnDesplegar = view.findViewById(R.id.btnAgregarAct);
         btnDesplegar.setOnClickListener(view1 -> mostrarMenu(view1));
+        materia_profe = Datos.UsuarioDao.obtenerMateria(requireContext());
         vincularBotonMenu(view, R.id.iBtnMenu);
         return view;
     }
@@ -62,17 +104,43 @@ public class Fragment_Actividad extends FragmentBase {
     }
 
     private void mostrarMensaje(String tipo) {
+        archiUrl    = null;
+        archiNombre = null;
         View ventFlotante = LayoutInflater.from(requireContext()).inflate(R.layout.view_mensaje, null);
 
         EditText etTitulo      = ventFlotante.findViewById(R.id.etTitulo);
         EditText etDescripcion = ventFlotante.findViewById(R.id.etDescripcion);
         EditText etFecha       = ventFlotante.findViewById(R.id.etFecha);
+        EditText etUrl         = ventFlotante.findViewById(R.id.etEnlace);
+        Button btnSelecArchi   = ventFlotante.findViewById(R.id.btnSelecArchi);
+        layoutArchiSelec       = ventFlotante.findViewById(R.id.layoutArchiSelec);
+        tvNombreArchivo        = ventFlotante.findViewById(R.id.tvNomArchi);
+        ImageButton btnElimina = ventFlotante.findViewById(R.id.btnEliminaArchi);
+        Spinner spinnerTrimestre = ventFlotante.findViewById(R.id.spinnerTrimestreAct);
+
+        List<Integer> trimestreIds = new ArrayList<>();
+        List<String> trimestreNombres = new ArrayList<>();
+        cargarTrimestresAct(trimestreIds, trimestreNombres);
+
+        ArrayAdapter<String> adapterTrim = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, trimestreNombres);
+        adapterTrim.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerTrimestre.setAdapter(adapterTrim);
+
+        btnSelecArchi.setOnClickListener(v -> selectArchi.launch("*/*"));
+
+        btnElimina.setOnClickListener(v -> {
+            archiUrl    = null;
+            archiNombre = null;
+            layoutArchiSelec.setVisibility(View.GONE);
+        });
 
         new AlertDialog.Builder(requireContext()).setTitle("Agregar " + tipo).setView(ventFlotante)
                 .setPositiveButton("Guardar", (dialog, which) -> {
                     String titulo      = etTitulo.getText().toString().trim();
                     String descripcion = etDescripcion.getText().toString().trim();
                     String fecha       = etFecha.getText().toString().trim();
+                    String url         = etUrl.getText().toString().trim();
+                    String adjunInfo;
 
                     if (titulo.isEmpty()) {
                         Toast.makeText(requireContext(),"Agregue un titulo", Toast.LENGTH_SHORT).show();
@@ -86,8 +154,77 @@ public class Fragment_Actividad extends FragmentBase {
                         Toast.makeText(requireContext(),"Agregue la fecha", Toast.LENGTH_SHORT).show();
                         return;
                     }
+                    int posTrimestre = spinnerTrimestre.getSelectedItemPosition();
+                    if (posTrimestre < 0 || posTrimestre >= trimestreIds.size()) {
+                        Toast.makeText(requireContext(),"Seleccione un trimestre", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    int trimestreId = trimestreIds.get(posTrimestre);
 
-                    Toast.makeText(requireContext(),tipo + " guardado: " + titulo, Toast.LENGTH_SHORT).show();
-                }).setNegativeButton("Cancelar", null).show();
+                    if (!url.isEmpty()) {
+                        adjunInfo = "Enlace: " + url;
+                    } else if (archiUrl != null) {
+                        adjunInfo = "Archivo: " + archiNombre;
+                    } else {
+                        adjunInfo = "Sin adjunto";
+                    }
+
+                    guardarActividad(tipo, titulo, descripcion, fecha, url, archiUrl, archiNombre, trimestreId);
+                    Toast.makeText(requireContext(),tipo + " guardado: " + titulo + " " + adjunInfo, Toast.LENGTH_SHORT).show();
+                }).setNegativeButton("Cancelar", (dialog, which) -> {
+                    layoutArchiSelec = null;
+                    tvNombreArchivo = null;
+                }).show();
+    }
+    private void cargarTrimestresAct(List<Integer> ids, List<String> nombres) {
+        admin = new AdminSQLiteOpenHelper(requireContext(), "BD_Sygemy", null, 1);
+        SQLiteDatabase bd_trimesAct = admin.getReadableDatabase();
+        Cursor fila = bd_trimesAct.rawQuery("SELECT id, nombre FROM trimestres ORDER BY id", null);
+
+        if (fila.moveToFirst()) {
+            do {
+                ids.add(fila.getInt(0));
+                nombres.add(fila.getString(1));
+            } while (fila.moveToNext());
+        }
+        fila.close();
+        bd_trimesAct.close();
+    }
+    private void guardarActividad( String tipo, String titulo, String descripcion, String fecha, String url, Uri archivoUrl, String archivoNombre, int trimestreId) {
+
+        android.util.Log.d("Actividad", "Tipo: " + tipo);
+        android.util.Log.d("Actividad", "Título: " + titulo);
+        android.util.Log.d("Actividad", "Descripción: " + descripcion);
+        android.util.Log.d("Actividad", "Fecha: " + fecha);
+        android.util.Log.d("Actividad", "Url: " + (url.isEmpty() ? "ninguno" : url));
+        android.util.Log.d("Actividad", "Archivo URL: " + (archivoUrl != null ? archivoUrl.toString() : "ninguno"));
+
+        if (archivoUrl != null) {
+            try {
+                requireContext().getContentResolver().takePersistableUriPermission(archivoUrl, android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            } catch (SecurityException e) {
+                e.printStackTrace();
+            }
+        }
+
+        Actividad act = new Actividad( tipo, titulo, descripcion, fecha, url, archivoNombre != null ? archivoNombre : "", archivoUrl != null ? archivoUrl.toString() : "", materia_profe, trimestreId);
+        ActividadDao daoAct = new ActividadDao(requireContext());
+        boolean cargado = daoAct.insertar(act);
+
+        if (!cargado) {
+            Toast.makeText(requireContext(), "Error al guardar la actividad", Toast.LENGTH_SHORT).show();
+        }
+    }
+    private String obtenNomArchiv(Uri uri) {
+        String nombArchi = "archivo_desconocido";
+        ContentResolver resol = requireContext().getContentResolver();
+
+        try (Cursor cursor = resol.query(uri, null, null, null, null)) {
+            if (cursor != null && cursor.moveToFirst()) {
+                int idx = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                if (idx >= 0) nombArchi = cursor.getString(idx);
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return nombArchi;
     }
 }

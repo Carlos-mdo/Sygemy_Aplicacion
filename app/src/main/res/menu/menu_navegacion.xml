@@ -55,27 +55,24 @@
             android:title="Calificaciones"/>
 
         <item
-            android:id="@+id/nav_entregas"
+            android:id="@+id/nav_correciones"
             android:title="Correcciones"/>
     </group>
 
     <!-- MENU ADMIN -->
     <group
         android:id="@+id/grupo_admin"
-        android:visible="true">
+        android:visible="false">
 
         <item
             android:id="@+id/nav_profesores"
             android:title="Profesores"/>
-
         <item
             android:id="@+id/nav_alumnos"
             android:title="Alumnos"/>
-
         <item
             android:id="@+id/nav_detalles"
             android:title="Detalles"/>
-
 
     </group>
 

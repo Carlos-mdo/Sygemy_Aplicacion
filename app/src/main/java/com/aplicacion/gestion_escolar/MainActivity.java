@@ -14,6 +14,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import Entidades.Usuarios;
 import Servicios.ServicioAdmin;
 import Servicios.ServicioUsuario;
 
@@ -22,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
     protected EditText etUsuario, etContrasenia;
     ServicioAdmin servAdmin;
     ServicioUsuario servUsuario;
-    public String rol;
+    public Usuarios rol;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,31 +72,25 @@ public class MainActivity extends AppCompatActivity {
 
         if(rol!=null){
 
-            switch (rol) {
-                case "admin": {
+            Datos.SesionDao.getInstancia().iniciarSesion(rol);
+            String rolTexto = rol.getRol();
 
-//                    guardarRol("admin");
-                    Intent intent = new Intent(this, MenuAdminActivity.class);
-                    startActivity(intent);
-                    break;
-                }
-                case "profesor": {
-
-                    guardarRol("profe");
-                    Intent intent = new Intent(this, MenuUsuarioActivity.class);
-                    startActivity(intent);
-                    break;
-                }
-                case "alumno": {
-
-                    guardarRol("alumno");
-                    Intent intent = new Intent(this, MenuUsuarioActivity.class);
-                    startActivity(intent);
-                    break;
-                }
-                default:
-                    Toast.makeText(this, "error al buscar el usuario", Toast.LENGTH_SHORT).show();
-                    break;
+            if (rolTexto.equals("admin")) {
+                guardarRol("admin");
+                Intent intent = new Intent(this, MenuAdminActivity.class);
+                startActivity(intent);
+            } else if (rolTexto.equals("profesor")) {
+                guardarRol("profe");
+                Intent intent = new Intent(this, MenuUsuarioActivity.class);
+                startActivity(intent);
+            } else if (rolTexto.equals("alumno")) {
+                int alumnoId = obtenerAlumnoIdPorUsuario(rol.getId());
+                Datos.UsuarioDao.guardarAlumno(this, alumnoId);
+                guardarRol("alumn");
+                Intent intent = new Intent(this, MenuUsuarioActivity.class);
+                startActivity(intent);
+            } else {
+                Toast.makeText(this, "error al buscar el usuario", Toast.LENGTH_SHORT).show();
             }
         }else
         {
@@ -110,6 +105,20 @@ public class MainActivity extends AppCompatActivity {
         edit.clear();
         edit.putString("rol", rol);
         edit.apply();
+    }
+
+    private int obtenerAlumnoIdPorUsuario(int usuarioId) {
+        Datos.AdminSQLiteOpenHelper admin = new Datos.AdminSQLiteOpenHelper(this, "BD_Sygemy", null, 1);
+        android.database.sqlite.SQLiteDatabase db = admin.getReadableDatabase();
+        android.database.Cursor cursor = db.rawQuery(
+                "SELECT id FROM alumnos WHERE usuario_id = ?",
+                new String[]{ String.valueOf(usuarioId) });
+
+        int id = -1;
+        if (cursor.moveToFirst()) { id = cursor.getInt(0); }
+        cursor.close();
+        db.close();
+        return id;
     }
 
 }

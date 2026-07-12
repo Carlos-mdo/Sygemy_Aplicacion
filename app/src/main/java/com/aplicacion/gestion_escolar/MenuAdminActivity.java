@@ -1,7 +1,13 @@
 package com.aplicacion.gestion_escolar;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.ConditionVariable;
+import android.util.Log;
+import android.view.Menu;
 import android.view.View;
 import android.widget.ImageButton;
 
@@ -19,7 +25,7 @@ import Ventana.Admin.Fragment_MenuDetalles;
 import Ventana.Admin.Fragment_Profesores;
 import com.google.android.material.navigation.NavigationView;
 
-public class MenuAdminActivity extends AppCompatActivity {
+public class MenuAdminActivity extends AppCompatActivity implements ControllerDrawerMenu{
 
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
@@ -34,54 +40,45 @@ public class MenuAdminActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_admin);
 
-        ViewCompat.setOnApplyWindowInsetsListener(
-                findViewById(R.id.main),
+        ViewCompat.setOnApplyWindowInsetsListener( findViewById(R.id.main),
                 (v, insets) -> {
 
-                    Insets systemBars =
-                            insets.getInsets(
-                                    WindowInsetsCompat.Type.systemBars()
-                            );
-
-                    v.setPadding(
-                            systemBars.left,
-                            systemBars.top,
-                            systemBars.right,
-                            systemBars.bottom
-                    );
+                    Insets systemBars = insets.getInsets( WindowInsetsCompat.Type.systemBars());
+                    v.setPadding( systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
 
                     return insets;
                 });
 
-        drawerLayout = findViewById(R.id.layoutEscuela);
+        drawerLayout = findViewById(R.id.layoutAdministracion);
         navigationView = findViewById(R.id.navigationView);
-        btnMenu = findViewById(R.id.iBtnMenu);
+        btnMenu = findViewById(R.id.iBtnMenuAdmin);
 
         btnMenu.setOnClickListener(v -> desplegarMenu());
 
         seleccionMenu();
+        roles();
     }
 
     private void seleccionMenu() {
-
+        SharedPreferences spref = getSharedPreferences("Roles", Context.MODE_PRIVATE);
+        String rol = spref.getString("rol","");
         navigationView.setNavigationItemSelectedListener(item -> {
 
             int id = item.getItemId();
 
             if (id == R.id.nav_profesores) {
-
                 cargarFragment(new Fragment_Profesores());
-
-            } else if (id == R.id.nav_alumnos) {
-
+                return true;
+            }
+            if (id == R.id.nav_alumnos) {
                 cargarFragment(new Fragment_Alumnos());
-
-            } else if (id == R.id.nav_detalles) {
-
+                return true;
+            }
+            if (id == R.id.nav_detalles) {
                 cargarFragment(new Fragment_MenuDetalles());
-
-            } else if (id == R.id.nav_cerrar) {
-
+                return true;
+            }
+            if (id == R.id.nav_cerrar) {
                 Intent intent = new Intent(
                         MenuAdminActivity.this,
                         MainActivity.class
@@ -89,16 +86,30 @@ public class MenuAdminActivity extends AppCompatActivity {
 
                 startActivity(intent);
                 finish();
+                return true;
             }
-
-            return true;
+            return false;
         });
+    }
+    public void roles(){
+        SharedPreferences spref = getSharedPreferences("Roles", Context.MODE_PRIVATE);
+        String rol = spref.getString("rol","sin_rol");
+
+        activarRol(rol);
+    }
+    public void activarRol(String rol){
+        Menu menu = navigationView.getMenu();
+
+        menu.setGroupVisible(R.id.grupo_profesores, rol.equals("profe"));
+        menu.setGroupVisible(R.id.grupo_alumnos, rol.equals("alumn"));
+        menu.setGroupVisible(R.id.grupo_admin, rol.equals("admin"));
+
     }
 
     private void cargarFragment(Fragment fragment) {
 
-        View scrollBienvenida = findViewById(R.id.scrollBienvenida);
-        View contenedorFragment = findViewById(R.id.contenedorFragment);
+        View scrollBienvenida = findViewById(R.id.scrollBienvenAdmin);
+        View contenedorFragment = findViewById(R.id.contenFragmentAdmin);
 
         if (scrollBienvenida != null) {
             scrollBienvenida.setVisibility(View.GONE);
@@ -110,7 +121,7 @@ public class MenuAdminActivity extends AppCompatActivity {
 
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.contenedorFragment, fragment)
+                .replace(R.id.contenFragmentAdmin, fragment)
                 .commit();
 
         cerrarNav();

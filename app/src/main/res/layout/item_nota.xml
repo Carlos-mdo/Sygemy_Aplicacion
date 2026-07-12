@@ -1,57 +1,48 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="10dp">
-
-        <TextView
-            android:id="@+id/txtDescripcion"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:text="Descripción" />
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:padding="12dp">
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_weight="1"
+        android:orientation="vertical">
 
         <TextView
-            android:id="@+id/txtNota"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Nota: 0.0"
-            android:gravity="center"/>
-
-        <TextView
-            android:id="@+id/txtFecha"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Fecha"
-            android:gravity="center"/>
-        </LinearLayout>
-
-        <LinearLayout
+            android:id="@+id/txtDescripcion_Nota"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:textStyle="bold" />
 
-            <Button
-                android:id="@+id/btnEditar"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:text="Editar"/>
+        <TextView
+            android:id="@+id/txtNota_Nota"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
-            <Button
-                android:id="@+id/btnEliminar"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:text="Eliminar"/>
-        </LinearLayout>
+        <TextView
+            android:id="@+id/txtFecha_Nota"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/btnEditar_Nota"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:src="@android:drawable/ic_menu_edit"
+        android:contentDescription="Editar nota" />
+
+    <ImageButton
+        android:id="@+id/btnEliminar_Nota"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:src="@android:drawable/ic_menu_delete"
+        android:contentDescription="Eliminar nota" />
+
 </LinearLayout>
