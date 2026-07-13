@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import Datos.AdminSQLiteOpenHelper;
+import Entidades.Alumno;
 import Entidades.Usuarios;
 import Entidades.Profesor;
 
@@ -89,11 +90,13 @@ public class ServicioAdmin {
                         cursor.getColumnIndexOrThrow("genero_prof"));
 
                 String materia = cursor.getString(
-                        cursor.getColumnIndexOrThrow("materia"));
+                        cursor.getColumnIndexOrThrow("materia_prof"));
 
                 int usuarioId = cursor.getInt(
                         cursor.getColumnIndexOrThrow("usuario_id"));
 
+                double sueldo = cursor.getDouble(
+                        cursor.getColumnIndexOrThrow("sueldo_prof"));
                 Profesor profesor = new Profesor(
                         id,
                         dni,
@@ -101,7 +104,8 @@ public class ServicioAdmin {
                         apellido,
                         genero,
                         materia,
-                        usuarioId
+                        usuarioId,
+                        sueldo
                 );
 
                 listaProfesores.add(profesor);
@@ -112,6 +116,56 @@ public class ServicioAdmin {
         cursor.close();
 
         return listaProfesores;
+    }
+
+    public List<Alumno> BuscarTodosAlumnos() {
+
+        List<Alumno> listaAlumnos = new ArrayList<>();
+
+        Cursor cursor = base_Datos.rawQuery("SELECT * FROM alumnos", null);
+
+        if (cursor.moveToFirst()) {
+            do {
+
+                int id = cursor.getInt(
+                        cursor.getColumnIndexOrThrow("id"));
+
+                String dni = cursor.getString(
+                        cursor.getColumnIndexOrThrow("dni_alum"));
+
+                String nombre = cursor.getString(
+                        cursor.getColumnIndexOrThrow("nombre_alum"));
+
+                String apellido = cursor.getString(
+                        cursor.getColumnIndexOrThrow("apellido_alum"));
+
+                String genero = cursor.getString(
+                        cursor.getColumnIndexOrThrow("genero_alum"));
+
+                String materia = cursor.getString(
+                        cursor.getColumnIndexOrThrow("curso_alum"));
+
+                int usuarioId = cursor.getInt(
+                        cursor.getColumnIndexOrThrow("usuario_id"));
+
+               Alumno alumno = new Alumno(
+                        id,
+                        dni,
+                        nombre,
+                        apellido,
+                        genero,
+                        materia,
+                        usuarioId
+                );
+
+                listaAlumnos.add(alumno);
+
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+
+        return listaAlumnos;
     }
     public void eliminarUsuario(int id) {
         base_Datos.delete("usuarios", "id = ?",
@@ -131,5 +185,43 @@ public class ServicioAdmin {
 
         base_Datos.update("usuarios", valores, "id = ?",
                 new String[]{String.valueOf(usuario.getId())});
+    }
+
+    public void actualizarProfesor(Profesor profesor) {
+
+        ContentValues valores = new ContentValues();
+
+        valores.put("dni_prof", profesor.getDni());
+        valores.put("nombre_prof", profesor.getNombre());
+        valores.put("apellido_prof", profesor.getApellido());
+        valores.put("genero_prof", profesor.getGenero());
+        valores.put("materia_prof", profesor.getMateria());
+        valores.put("sueldo_prof", profesor.getSueldo());
+
+        base_Datos.update(
+                "profesores",
+                valores,
+                "id = ?",
+                new String[]{String.valueOf(profesor.getId())}
+        );
+    }
+
+
+    public void actualizarAlumno(Alumno alumno) {
+
+        ContentValues valores = new ContentValues();
+
+        valores.put("dni_alum", alumno.getDni());
+        valores.put("nombre_alum", alumno.getNombre());
+        valores.put("apellido_alum", alumno.getApellido());
+        valores.put("curso_alum", alumno.getCurso());
+        valores.put("genero_alum", alumno.getGenero());
+
+        base_Datos.update(
+                "alumnos",
+                valores,
+                "id = ?",
+                new String[]{String.valueOf(alumno.getId())}
+        );
     }
 }

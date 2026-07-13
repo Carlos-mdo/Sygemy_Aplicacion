@@ -53,7 +53,7 @@ public class Fragment_DetalleProfesores extends Fragment {
 
         recyclerProfesores.setLayoutManager(new GridLayoutManager(getContext(), 2));
 
-        ProfesorAdapter adapter = new ProfesorAdapter(listProfesores);
+        ProfesorAdapter adapter = new ProfesorAdapter(listProfesores,servicioAdmin);
 
         recyclerProfesores.setAdapter(adapter);
 

@@ -28,8 +28,9 @@ import Datos.AdminSQLiteOpenHelper;
 public class Fragment_Alumnos extends Fragment {
 
     public String[] generos = {"Seleccionar", "Femenino", "Masculino"};
-    public Spinner spinnerGenero;
-    public EditText etDni, etNombre, etApellido, etUsuario, etContrasenia, etCurso;
+    public String[] curso = {"Seleccionar", "1", "2", "3","4","5","6"};
+    public Spinner spinnerGenero, spinnerCurso;
+    public EditText etDni, etNombre, etApellido, etUsuario, etContrasenia;
     public Button btnGuardado;
     public ImageButton btnRegreso;
     protected AdminSQLiteOpenHelper datos;
@@ -54,8 +55,8 @@ public class Fragment_Alumnos extends Fragment {
         etNombre     = view.findViewById(R.id.etNombreAlum);
         etApellido   = view.findViewById(R.id.etApellidoAlum);
         etUsuario    = view.findViewById(R.id.etUsuarioAlum);
-        etContrasenia= view.findViewById(R.id.etContraseniaAlum);
-        etCurso      = view.findViewById(R.id.etCurso);
+        etContrasenia = view.findViewById(R.id.etContraseniaAlum);
+        spinnerCurso = view.findViewById(R.id.spinCurso);
         spinnerGenero= view.findViewById(R.id.spinGenero);
         btnGuardado  = view.findViewById(R.id.btnAgregarAlum);
         btnRegreso   = view.findViewById(R.id.btnRegresoAlum);
@@ -68,6 +69,17 @@ public class Fragment_Alumnos extends Fragment {
 
         adapterGenero.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerGenero.setAdapter(adapterGenero);
+
+        ArrayAdapter<String> adapterCurso = new ArrayAdapter<>(
+                requireContext(),
+                android.R.layout.simple_spinner_item,
+                curso
+        );
+
+        adapterCurso.setDropDownViewResource(
+                android.R.layout.simple_spinner_dropdown_item
+        );
+        spinnerCurso.setAdapter(adapterCurso);
 
         btnGuardado.setOnClickListener(v -> {
             if (validacionAlumnos()) {
@@ -95,7 +107,7 @@ public class Fragment_Alumnos extends Fragment {
         valorAlumno.put("dni_alum",    etDni.getText().toString().trim());
         valorAlumno.put("nombre_alum", etNombre.getText().toString().trim());
         valorAlumno.put("apellido_alum",etApellido.getText().toString().trim());
-        valorAlumno.put("curso_alum",  etCurso.getText().toString().trim());
+        valorAlumno.put("curso_alum",  spinnerCurso.getSelectedItem().toString());
         valorAlumno.put("genero_alum", spinnerGenero.getSelectedItem().toString());
         valorAlumno.put("usuario_id",  idUsuario);
 
@@ -117,7 +129,7 @@ public class Fragment_Alumnos extends Fragment {
         etApellido.setText("");
         etUsuario.setText("");
         etContrasenia.setText("");
-        etCurso.setText("");
+        spinnerCurso.setSelection(0);
         spinnerGenero.setSelection(0);
     }
 
@@ -128,7 +140,7 @@ public class Fragment_Alumnos extends Fragment {
         etApellido.setError(null);
         etUsuario.setError(null);
         etContrasenia.setError(null);
-        etCurso.setError(null);
+
 
         boolean valido = true;
 
@@ -144,11 +156,7 @@ public class Fragment_Alumnos extends Fragment {
             etApellido.setError("Ingrese el apellido");
             valido = false;
         }
-        if (etCurso.getText().toString().trim().isEmpty()) {
-            etCurso.setError("Ingrese el curso");
-            valido = false;
-        }
-        if (etUsuario.getText().toString().trim().isEmpty()) {
+                if (etUsuario.getText().toString().trim().isEmpty()) {
             etUsuario.setError("Ingrese el usuario");
             valido = false;
         }
@@ -158,6 +166,10 @@ public class Fragment_Alumnos extends Fragment {
         }
         if (spinnerGenero.getSelectedItemPosition() == 0) {
             Toast.makeText(getContext(), "Seleccione un género", Toast.LENGTH_SHORT).show();
+            valido = false;
+        }
+        if (spinnerCurso.getSelectedItemPosition() == 0) {
+            Toast.makeText(getContext(), "Seleccione un curso", Toast.LENGTH_SHORT).show();
             valido = false;
         }
 

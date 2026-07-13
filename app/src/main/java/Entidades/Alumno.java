@@ -1,27 +1,26 @@
 package Entidades;
 
-public class Profesor {
+public class Alumno {
     private int id;
     private String dni;
     private String nombre;
     private String apellido;
     private String genero;
-    private String materia;
-    private  Double sueldo;
+    private String curso;
     private int usuarioId;
 
-    public Profesor(int id, String dni, String nombre,
+
+    public Alumno(int id, String dni, String nombre,
                     String apellido, String genero,
-                    String materia, int usuarioId, double sueldo) {
+                    String curso, int usuarioId) {
 
         this.id = id;
         this.dni = dni;
         this.nombre = nombre;
         this.apellido = apellido;
         this.genero = genero;
-        this.materia = materia;
+        this.curso = curso;
         this.usuarioId = usuarioId;
-        this.sueldo = sueldo;
     }
 
     public int getId() {
@@ -64,12 +63,12 @@ public class Profesor {
         this.genero = genero;
     }
 
-    public String getMateria() {
-        return materia;
+    public String getCurso() {
+        return curso;
     }
 
-    public void setMateria(String materia) {
-        this.materia = materia;
+    public void setCurso(String curso) {
+        this.curso = curso;
     }
 
     public int getUsuarioId() {
@@ -78,13 +77,5 @@ public class Profesor {
 
     public void setUsuarioId(int usuarioId) {
         this.usuarioId = usuarioId;
-    }
-
-    public Double getSueldo() {
-        return sueldo;
-    }
-
-    public void setSueldo(Double sueldo) {
-        this.sueldo = sueldo;
     }
 }

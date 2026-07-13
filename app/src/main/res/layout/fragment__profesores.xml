@@ -104,6 +104,7 @@
             android:id="@+id/txtViewMateria"
             android:layout_width="65dp"
             android:layout_height="22dp"
+            android:layout_marginStart="36dp"
             android:text="Materia:"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -111,7 +112,7 @@
             app:layout_constraintHorizontal_bias="0.84"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.619" />
+            app:layout_constraintVertical_bias="0.626" />
 
         <TextView
             android:id="@+id/txtViewGenero"
@@ -196,13 +197,10 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.542" />
 
-        <EditText
-            android:id="@+id/etMateriaProfe"
-            android:layout_width="wrap_content"
+        <Spinner
+            android:id="@+id/spinMateria"
+            android:layout_width="218dp"
             android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="Introducir la materia"
-            android:inputType="text"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.542"
@@ -219,7 +217,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.816" />
+            app:layout_constraintVertical_bias="0.868" />
 
         <ImageButton
             android:id="@+id/btnRegresoProfe"
@@ -246,6 +244,32 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <TextView
+            android:id="@+id/txtViewSueldo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sueldo:"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/etSueldoProfe"
+            app:layout_constraintHorizontal_bias="0.83"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.775" />
+
+        <EditText
+            android:id="@+id/etSueldoProfe"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="Introducir sueldo"
+            android:inputType="numberDecimal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.542"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.775" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

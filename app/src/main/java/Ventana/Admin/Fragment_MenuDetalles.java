@@ -52,7 +52,8 @@ public class Fragment_MenuDetalles extends Fragment {
 
         String[] titulos = {
                 "Usuarios",
-                "Profesores"
+                "Profesores",
+                "Alumnos"
         };
 
         new TabLayoutMediator(

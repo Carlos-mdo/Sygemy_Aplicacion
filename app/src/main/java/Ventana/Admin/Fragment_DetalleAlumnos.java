@@ -2,6 +2,10 @@ package Ventana.Admin;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageButton;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -9,29 +13,25 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageButton;
-
 import com.aplicacion.gestion_escolar.MenuAdminActivity;
 import com.aplicacion.gestion_escolar.R;
 
 import java.util.List;
 
-import Adapter.UsuarioAdapter;
-import Entidades.Usuarios;
+import Adapter.AlumnoAdapter;
+import Adapter.ProfesorAdapter;
+import Entidades.Alumno;
+import Entidades.Profesor;
 import Servicios.ServicioAdmin;
 
-public class Fragment_DetalleUsuarios extends Fragment {
+public class Fragment_DetalleAlumnos extends Fragment {
 
     private ServicioAdmin servicioAdmin;
-    private List<Usuarios> listUsuarios;
-    private RecyclerView recyclerUsuarios;
+    private List<Alumno> listAlumnos;
+    private RecyclerView recyclerAlumnos;
     private ImageButton btnRegreso;
-    private UsuarioAdapter adapter;
 
-    public Fragment_DetalleUsuarios() {
+    public Fragment_DetalleAlumnos() {
     }
 
     @Override
@@ -47,15 +47,15 @@ public class Fragment_DetalleUsuarios extends Fragment {
 
         servicioAdmin = new ServicioAdmin(getContext());
 
-        listUsuarios = servicioAdmin.BuscarTodosUsuarios();
+        listAlumnos = servicioAdmin.BuscarTodosAlumnos();
 
-        recyclerUsuarios = view.findViewById(R.id.recyclerUsuarios);
+        recyclerAlumnos = view.findViewById(R.id.recyclerUsuarios);
 
-        recyclerUsuarios.setLayoutManager(new GridLayoutManager(getContext(), 2));
+        recyclerAlumnos.setLayoutManager(new GridLayoutManager(getContext(), 2));
 
-        adapter = new UsuarioAdapter(listUsuarios, servicioAdmin);
+        AlumnoAdapter adapter = new AlumnoAdapter(listAlumnos,servicioAdmin);
 
-        recyclerUsuarios.setAdapter(adapter);
+        recyclerAlumnos.setAdapter(adapter);
 
         btnRegreso = view.findViewById(R.id.btnRegresoDetalles);
 
@@ -63,21 +63,5 @@ public class Fragment_DetalleUsuarios extends Fragment {
             Intent intent = new Intent(requireContext(), MenuAdminActivity.class);
             startActivity(intent);
         });
-    }
-
-    private void actualizarUsuarios() {
-
-        adapter.actualizarLista(
-                servicioAdmin.BuscarTodosUsuarios()
-        );
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        if (adapter != null) {
-            actualizarUsuarios();
-        }
     }
 }

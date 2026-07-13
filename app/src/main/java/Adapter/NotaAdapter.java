@@ -28,6 +28,7 @@ public class NotaAdapter extends ArrayAdapter<Calificacion> {
     private final List<Calificacion> lista;
     private final OnNotaListener listener;
 
+
     public NotaAdapter(@NonNull Context context, @NonNull List<Calificacion> lista, OnNotaListener listener) {
         super(context, 0, lista);
         this.lista = lista;
@@ -44,11 +45,11 @@ public class NotaAdapter extends ArrayAdapter<Calificacion> {
 
         Calificacion c = lista.get(posicion);
 
-        TextView tvDescripcionNota = v.findViewById(R.id.tvDescripcionNota);
-        TextView tvNotaNota = v.findViewById(R.id.tvNotaNota);
-        TextView tvFechaNota = v.findViewById(R.id.tvFechaNota);
-        ImageButton btnEditarNota = v.findViewById(R.id.btnEditarNota);
-        ImageButton btnEliminarNota = v.findViewById(R.id.btnEliminarNota);
+        TextView tvDescripcionNota = v.findViewById(R.id.txtDescripcion_Nota);
+        TextView tvNotaNota = v.findViewById(R.id.txtNota_Nota);
+        TextView tvFechaNota = v.findViewById(R.id.txtFecha_Nota);
+        ImageButton btnEditarNota = v.findViewById(R.id.btnEditar_Nota);
+        ImageButton btnEliminarNota = v.findViewById(R.id.btnEliminar_Nota);
 
         tvDescripcionNota.setText(c.descripcion);
         tvNotaNota.setText("Nota: " + c.nota);

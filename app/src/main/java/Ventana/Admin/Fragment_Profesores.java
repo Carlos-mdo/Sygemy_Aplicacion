@@ -31,9 +31,23 @@ import Datos.AdminSQLiteOpenHelper;
 
 public class Fragment_Profesores extends Fragment {
 
-    private EditText etNombre,etApellido,etUsuario, etContrasenia, etDni, etMateria;
+    private EditText etNombre,etApellido,etUsuario, etContrasenia, etDni, etSueldo;
     public String[] generos = {"Seleccionar","Femenino","Masculino"};
-    public Spinner spinnerGenero;
+
+    public String[] materias = {
+            "Seleccionar",
+            "Matemática",
+            "Lengua",
+            "Historia",
+            "Geografía",
+            "Biología",
+            "Física",
+            "Química",
+            "Inglés",
+            "Educación Física",
+            "Informática"
+    };
+    public Spinner spinnerGenero, spinnerMateria;
     public TextView txtErrorGenero;
     public Button btnGuardar;
     public ImageButton btnRegreso;
@@ -76,14 +90,22 @@ public class Fragment_Profesores extends Fragment {
         etUsuario = view.findViewById(R.id.etUsuarioProfe);
         etContrasenia = view.findViewById(R.id.etContraseniaProfe);
         etDni = view.findViewById(R.id.etDniProfe);
-        etMateria = view.findViewById(R.id.etMateriaProfe);
+        etSueldo = view.findViewById(R.id.etSueldoProfe);
         spinnerGenero = view.findViewById(R.id.spinGenero);
+        spinnerMateria = view.findViewById(R.id.spinMateria);
 
         ArrayAdapter<String> array = new ArrayAdapter<String>(requireContext(), android.R.layout.simple_spinner_item,generos);
 
         array.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         spinnerGenero.setAdapter(array);
+
+        ArrayAdapter<String> adapterMateria = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, materias);
+
+        adapterMateria.setDropDownViewResource(
+                android.R.layout.simple_spinner_dropdown_item);
+
+        spinnerMateria.setAdapter(adapterMateria);
 
         btnGuardar = view.findViewById(R.id.btnAgregarProfe);
         btnRegreso = view.findViewById(R.id.btnRegresoProfe);
@@ -114,11 +136,23 @@ public class Fragment_Profesores extends Fragment {
 
         long idUsuario = baseDeDatos.insert("usuarios",null,contentValues);
 
+        if (idUsuario == -1) {
+            Toast.makeText(getContext(),
+                    "El usuario ya existe",
+                    Toast.LENGTH_SHORT).show();
+
+            etUsuario.setError("Usuario ya registrado");
+            return;
+        }
+
+
+
         contentValuesProfe.put("dni_prof",etDni.getText().toString());
         contentValuesProfe.put("nombre_prof",etNombre.getText().toString());
         contentValuesProfe.put("apellido_prof",etApellido.getText().toString());
-        contentValuesProfe.put("materia",etMateria.getText().toString());
+        contentValuesProfe.put("materia_prof",spinnerMateria.getSelectedItem().toString());
         contentValuesProfe.put("genero_prof", spinnerGenero.getSelectedItem().toString());
+        contentValuesProfe.put("sueldo_prof", Double.parseDouble(etSueldo.getText().toString()));
         contentValuesProfe.put("usuario_id", idUsuario);
 
         baseDeDatos.insert("profesores",null,contentValuesProfe);
@@ -128,7 +162,8 @@ public class Fragment_Profesores extends Fragment {
         etUsuario.setText("");
         etContrasenia.setText("");
         etDni.setText("");
-        etMateria.setText("");
+        etSueldo.setText("");
+        spinnerMateria.setSelection(0);
         spinnerGenero.setSelection(0);
 
     }
@@ -164,6 +199,18 @@ public class Fragment_Profesores extends Fragment {
         }
         if(spinnerGenero.getSelectedItemPosition() == 0){
             Toast.makeText(getContext(), "Seleccione un género", Toast.LENGTH_SHORT).show();
+            estado = false;
+        }
+
+        if (spinnerMateria.getSelectedItemPosition() == 0) {
+            Toast.makeText(getContext(),
+                    "Seleccione una materia",
+                    Toast.LENGTH_SHORT).show();
+            estado = false;
+        }
+
+        if (etSueldo.getText().toString().trim().isEmpty()) {
+            etSueldo.setError("Ingrese el sueldo");
             estado = false;
         }
 

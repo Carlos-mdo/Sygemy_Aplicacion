@@ -1,5 +1,4 @@
 package Datos;
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -8,7 +7,6 @@ import androidx.annotation.Nullable;
 
 import java.util.Base64;
 
-import Entidades.Horarios;
 import Entidades.Usuarios;
 
 public class AdminSQLiteOpenHelper extends SQLiteOpenHelper{
@@ -35,9 +33,9 @@ public class AdminSQLiteOpenHelper extends SQLiteOpenHelper{
                 "nombre_prof TEXT NOT NULL," +
                 "apellido_prof TEXT NOT NULL," +
                 "genero_prof TEXT," +
-                "materia TEXT," +
+                "materia_prof TEXT," +
                 "usuario_id INTEGER," +
-                "sueldo_id MONEY," +
+                "sueldo_prof REAL," +
                 "FOREIGN KEY(usuario_id) REFERENCES usuarios(id))");
 
         BaseDeDatos.execSQL("CREATE TABLE alumnos ("+
@@ -106,19 +104,22 @@ public class AdminSQLiteOpenHelper extends SQLiteOpenHelper{
                 "profesor_id INTEGER," +
                 "FOREIGN KEY(profesor_id) REFERENCES profesores(id))");
 
-        ContentValues profeValores = new ContentValues();
-        profeValores.put("dni_prof", "00000000");
-        profeValores.put("nombre_prof", "Carlos");
-        profeValores.put("apellido_prof", "Ejemplo");
-        profeValores.put("materia", "Matematica");
-        long profesorId = BaseDeDatos.insert("profesores", null, profeValores);
+//        ContentValues profeValores = new ContentValues();
+//        profeValores.put("dni_prof", "00000000");
+//        profeValores.put("nombre_prof", "Carlos");
+//        profeValores.put("apellido_prof", "Ejemplo");
+//        profeValores.put("materia", "Matematica");
+//        long profesorId = BaseDeDatos.insert("profesores", null, profeValores);
+//
+//        Horarios hora = new Horarios("6to_grado","Matematica","Lunes","09:00","11:00", (int) profesorId);
+//        BaseDeDatos.insert("horarios",null,hora.Valores());
+//
+//        BaseDeDatos.execSQL("INSERT INTO trimestres (nombre) VALUES ('1° Trimestre')");
+//        BaseDeDatos.execSQL("INSERT INTO trimestres (nombre) VALUES ('2° Trimestre')");
+//        BaseDeDatos.execSQL("INSERT INTO trimestres (nombre) VALUES ('3° Trimestre')");
+        // ---------- PROFESOR POR DEFECTO ----------
 
-        Horarios hora = new Horarios("6to_grado","Matematica","Lunes","09:00","11:00", (int) profesorId);
-        BaseDeDatos.insert("horarios",null,hora.Valores());
 
-        BaseDeDatos.execSQL("INSERT INTO trimestres (nombre) VALUES ('1° Trimestre')");
-        BaseDeDatos.execSQL("INSERT INTO trimestres (nombre) VALUES ('2° Trimestre')");
-        BaseDeDatos.execSQL("INSERT INTO trimestres (nombre) VALUES ('3° Trimestre')");
     }
 
     @Override

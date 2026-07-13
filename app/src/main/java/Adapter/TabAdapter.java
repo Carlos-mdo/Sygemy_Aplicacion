@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
+import Ventana.Admin.Fragment_DetalleAlumnos;
 import Ventana.Admin.Fragment_DetalleProfesores;
 import Ventana.Admin.Fragment_DetalleUsuarios;
 
@@ -25,6 +26,9 @@ public class TabAdapter extends FragmentStateAdapter {
             case 1:
                 return new Fragment_DetalleProfesores();
 
+            case 2:
+                return new Fragment_DetalleAlumnos();
+
             default:
                 return new Fragment_DetalleUsuarios();
         }
@@ -32,6 +36,6 @@ public class TabAdapter extends FragmentStateAdapter {
 
     @Override
     public int getItemCount() {
-        return 2;
+        return 3;
     }
 }
