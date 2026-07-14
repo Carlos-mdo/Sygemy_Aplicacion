@@ -46,7 +46,41 @@ public class AdminSQLiteOpenHelper extends SQLiteOpenHelper{
                 "curso_alum TEXT NOT NULL," +
                 "genero_alum TEXT," +
                 "usuario_id INTEGER," +
+                "cuotasPagadas_alum INTEGER DEFAULT 0," +
                 "FOREIGN KEY(usuario_id) REFERENCES usuarios(id))");
+
+        // ---------- USUARIOS DE PRUEBA ----------
+        BaseDeDatos.execSQL("INSERT INTO usuarios (usuario, contrasenia, rol) VALUES ('messi','1234','alumno')");
+        BaseDeDatos.execSQL("INSERT INTO usuarios (usuario, contrasenia, rol) VALUES ('julian','1234','alumno')");
+        BaseDeDatos.execSQL("INSERT INTO usuarios (usuario, contrasenia, rol) VALUES ('enzo','1234','alumno')");
+        BaseDeDatos.execSQL("INSERT INTO usuarios (usuario, contrasenia, rol) VALUES ('macallister','1234','alumno')");
+        BaseDeDatos.execSQL("INSERT INTO usuarios (usuario, contrasenia, rol) VALUES ('molina','1234','alumno')");
+        BaseDeDatos.execSQL("INSERT INTO usuarios (usuario, contrasenia, rol) VALUES ('romero','1234','alumno')");
+        BaseDeDatos.execSQL("INSERT INTO usuarios (usuario, contrasenia, rol) VALUES ('otamendi','1234','alumno')");
+        BaseDeDatos.execSQL("INSERT INTO usuarios (usuario, contrasenia, rol) VALUES ('tagliafico','1234','alumno')");
+        BaseDeDatos.execSQL("INSERT INTO usuarios (usuario, contrasenia, rol) VALUES ('paredes','1234','alumno')");
+        BaseDeDatos.execSQL("INSERT INTO usuarios (usuario, contrasenia, rol) VALUES ('depaul','1234','alumno')");
+
+        // ---------- ALUMNOS DE PRUEBA ----------
+        BaseDeDatos.execSQL("INSERT INTO alumnos (dni_alum,nombre_alum,apellido_alum,curso_alum,genero_alum,usuario_id,cuotasPagadas_alum) VALUES ('40111111','Lionel','Messi','6','Masculino',2,12)");
+
+        BaseDeDatos.execSQL("INSERT INTO alumnos (dni_alum,nombre_alum,apellido_alum,curso_alum,genero_alum,usuario_id,cuotasPagadas_alum) VALUES ('40222222','Julián','Álvarez','5','Masculino',3,8)");
+
+        BaseDeDatos.execSQL("INSERT INTO alumnos (dni_alum,nombre_alum,apellido_alum,curso_alum,genero_alum,usuario_id,cuotasPagadas_alum) VALUES ('40333333','Enzo','Fernández','4','Masculino',4,10)");
+
+        BaseDeDatos.execSQL("INSERT INTO alumnos (dni_alum,nombre_alum,apellido_alum,curso_alum,genero_alum,usuario_id,cuotasPagadas_alum) VALUES ('40444444','Alexis','Mac Allister','3','Masculino',5,6)");
+
+        BaseDeDatos.execSQL("INSERT INTO alumnos (dni_alum,nombre_alum,apellido_alum,curso_alum,genero_alum,usuario_id,cuotasPagadas_alum) VALUES ('40555555','Nahuel','Molina','2','Masculino',6,4)");
+
+        BaseDeDatos.execSQL("INSERT INTO alumnos (dni_alum,nombre_alum,apellido_alum,curso_alum,genero_alum,usuario_id,cuotasPagadas_alum) VALUES ('40666666','Cristian','Romero','1','Masculino',7,2)");
+
+        BaseDeDatos.execSQL("INSERT INTO alumnos (dni_alum,nombre_alum,apellido_alum,curso_alum,genero_alum,usuario_id,cuotasPagadas_alum) VALUES ('40777777','Nicolás','Otamendi','6','Masculino',8,11)");
+
+        BaseDeDatos.execSQL("INSERT INTO alumnos (dni_alum,nombre_alum,apellido_alum,curso_alum,genero_alum,usuario_id,cuotasPagadas_alum) VALUES ('40888888','Nicolás','Tagliafico','5','Masculino',9,7)");
+
+        BaseDeDatos.execSQL("INSERT INTO alumnos (dni_alum,nombre_alum,apellido_alum,curso_alum,genero_alum,usuario_id,cuotasPagadas_alum) VALUES ('40999999','Leandro','Paredes','4','Masculino',10,9)");
+
+        BaseDeDatos.execSQL("INSERT INTO alumnos (dni_alum,nombre_alum,apellido_alum,curso_alum,genero_alum,usuario_id,cuotasPagadas_alum) VALUES ('41000000','Rodrigo','De Paul','3','Masculino',11,5)");
 
         BaseDeDatos.execSQL("CREATE TABLE trimestres (" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT," +

@@ -161,7 +161,12 @@ public class ProfesorAdapter extends RecyclerView.Adapter<ProfesorAdapter.ViewHo
             inputSueldo.setHint("Sueldo");
             inputSueldo.setInputType(android.text.InputType.TYPE_CLASS_NUMBER |
                     android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL);
-            inputSueldo.setText(String.valueOf(profesor.getSueldo()));
+            inputSueldo.setText(
+                    java.math.BigDecimal
+                            .valueOf(profesor.getSueldo())
+                            .stripTrailingZeros()
+                            .toPlainString()
+            );
 
             Spinner spinnerMateria = new Spinner(context);
 
@@ -231,13 +236,61 @@ public class ProfesorAdapter extends RecyclerView.Adapter<ProfesorAdapter.ViewHo
 
                     .setPositiveButton("Guardar", (dialog, which) -> {
 
-                        if (inputNombre.getText().toString().trim().isEmpty() ||
-                                inputApellido.getText().toString().trim().isEmpty() ||
-                                inputDni.getText().toString().trim().isEmpty() ||
-                                inputSueldo.getText().toString().trim().isEmpty()) {
+                        String nombre = inputNombre.getText().toString().trim();
+                        String apellido = inputApellido.getText().toString().trim();
+                        String dni = inputDni.getText().toString().trim();
+                        String sueldo = inputSueldo.getText().toString().trim();
 
+                        if (nombre.isEmpty() || apellido.isEmpty() || dni.isEmpty() || sueldo.isEmpty()) {
                             Toast.makeText(context,
                                     "Complete todos los campos",
+                                    Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        if (!nombre.matches("[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+")) {
+                            Toast.makeText(context,
+                                    "El nombre solo puede contener letras",
+                                    Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        if (!apellido.matches("[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+")) {
+                            Toast.makeText(context,
+                                    "El apellido solo puede contener letras",
+                                    Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        if (!dni.matches("\\d{8}")) {
+                            Toast.makeText(context,
+                                    "El DNI debe tener 8 dígitos",
+                                    Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        if (!dni.equals(profesor.getDni()) && servicio.existeDni(dni)) {
+                            Toast.makeText(context,
+                                    "Ese DNI ya está registrado",
+                                    Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        double sueldoValor;
+
+                        try {
+                            sueldoValor = Double.parseDouble(sueldo);
+
+                            if (sueldoValor <= 0) {
+                                Toast.makeText(context,
+                                        "Ingrese un sueldo válido",
+                                        Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+
+                        } catch (NumberFormatException e) {
+                            Toast.makeText(context,
+                                    "Ingrese un sueldo válido",
                                     Toast.LENGTH_SHORT).show();
                             return;
                         }

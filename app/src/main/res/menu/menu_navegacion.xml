@@ -73,7 +73,10 @@
         <item
             android:id="@+id/nav_detalles"
             android:title="Detalles"/>
-
+        <item
+            android:id="@+id/nav_pagos"
+            android:title="Pagos"
+            android:icon="@android:drawable/ic_menu_save"/>
     </group>
 
     <group android:id="@+id/grupo_menu2">

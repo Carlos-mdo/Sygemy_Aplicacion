@@ -89,6 +89,7 @@ public class AlumnoAdapter extends RecyclerView.Adapter<AlumnoAdapter.ViewHolder
                     "ID: " + alumno.getId() + "\n\n" +
                             "DNI: " + alumno.getDni() + "\n\n" +
                             "Genero: " + alumno.getGenero() + "\n\n" +
+                            "Cuotas pagadas: " + alumno.getCuotasPagadas() + "/12" + "\n\n" +
                             "ID Usuario: " + alumno.getUsuarioId();
 
             new AlertDialog.Builder(context)
@@ -217,9 +218,13 @@ public class AlumnoAdapter extends RecyclerView.Adapter<AlumnoAdapter.ViewHolder
 
                 .setPositiveButton("Guardar", (dialog, which) -> {
 
-                    if (inputNombre.getText().toString().trim().isEmpty() ||
-                            inputApellido.getText().toString().trim().isEmpty() ||
-                            inputDni.getText().toString().trim().isEmpty()){
+                    String nombre = inputNombre.getText().toString().trim();
+                    String apellido = inputApellido.getText().toString().trim();
+                    String dni = inputDni.getText().toString().trim();
+
+                    if (nombre.isEmpty() ||
+                            apellido.isEmpty() ||
+                            dni.isEmpty()) {
 
                         Toast.makeText(context,
                                 "Complete todos los campos",
@@ -227,12 +232,39 @@ public class AlumnoAdapter extends RecyclerView.Adapter<AlumnoAdapter.ViewHolder
                         return;
                     }
 
-                    alumno.setNombre(inputNombre.getText().toString());
-                    alumno.setApellido(inputApellido.getText().toString());
-                    alumno.setDni(inputDni.getText().toString());
+                    if (!nombre.matches("[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+")) {
+                        Toast.makeText(context,
+                                "El nombre solo puede contener letras",
+                                Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    if (!apellido.matches("[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+")) {
+                        Toast.makeText(context,
+                                "El apellido solo puede contener letras",
+                                Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    if (!dni.matches("\\d{8}")) {
+                        Toast.makeText(context,
+                                "El DNI debe tener 8 números",
+                                Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    if (!dni.equals(alumno.getDni()) && servicio.existeDni(dni)) {
+                        Toast.makeText(context,
+                                "Ese DNI ya está registrado",
+                                Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    alumno.setNombre(nombre);
+                    alumno.setApellido(apellido);
+                    alumno.setDni(dni);
                     alumno.setCurso(spinnerCurso.getSelectedItem().toString());
                     alumno.setGenero(spinnerGenero.getSelectedItem().toString());
-
 
                     servicio.actualizarAlumno(alumno);
 

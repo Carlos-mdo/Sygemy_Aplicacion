@@ -1,5 +1,6 @@
 package Servicios;
 
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -148,6 +149,10 @@ public class ServicioAdmin {
                 int usuarioId = cursor.getInt(
                         cursor.getColumnIndexOrThrow("usuario_id"));
 
+                int cuotasPagadas = cursor.getInt(
+                        cursor.getColumnIndexOrThrow("cuotasPagadas_alum")
+                );
+
                Alumno alumno = new Alumno(
                         id,
                         dni,
@@ -155,7 +160,8 @@ public class ServicioAdmin {
                         apellido,
                         genero,
                         materia,
-                        usuarioId
+                        usuarioId,
+                        cuotasPagadas
                 );
 
                 listaAlumnos.add(alumno);
@@ -222,6 +228,47 @@ public class ServicioAdmin {
                 valores,
                 "id = ?",
                 new String[]{String.valueOf(alumno.getId())}
+        );
+    }
+
+    public boolean existeDni(String dni) {
+
+        Cursor cursor = base_Datos.rawQuery(
+                "SELECT 1 FROM alumnos WHERE dni_alum = ? " +
+                        "UNION " +
+                        "SELECT 1 FROM profesores WHERE dni_prof = ?",
+                new String[]{dni, dni}
+        );
+
+        boolean existe = cursor.moveToFirst();
+        cursor.close();
+
+        return existe;
+    }
+
+    public boolean existeUsuario(String usuario) {
+
+        Cursor cursor = base_Datos.rawQuery(
+                "SELECT id FROM usuarios WHERE usuario = ?",
+                new String[]{usuario}
+        );
+
+        boolean existe = cursor.moveToFirst();
+        cursor.close();
+
+        return existe;
+    }
+
+    public void actualizarCuotas(int idAlumno, int cuotas) {
+
+        ContentValues valores = new ContentValues();
+        valores.put("cuotasPagadas_alum", cuotas);
+
+        base_Datos.update(
+                "alumnos",
+                valores,
+                "id = ?",
+                new String[]{String.valueOf(idAlumno)}
         );
     }
 }

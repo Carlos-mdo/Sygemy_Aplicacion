@@ -24,6 +24,7 @@ import Ventana.Admin.Fragment_DetalleUsuarios;
 import Ventana.Admin.Fragment_MenuDetalles;
 import Ventana.Admin.Fragment_Profesores;
 import com.google.android.material.navigation.NavigationView;
+import Ventana.Admin.Fragment_Pagos;
 
 public class MenuAdminActivity extends AppCompatActivity implements ControllerDrawerMenu{
 
@@ -78,6 +79,13 @@ public class MenuAdminActivity extends AppCompatActivity implements ControllerDr
                 cargarFragment(new Fragment_MenuDetalles());
                 return true;
             }
+
+            if (id == R.id.nav_pagos) {
+                cargarFragment(new Fragment_Pagos());
+                return true;
+            }
+
+
             if (id == R.id.nav_cerrar) {
                 Intent intent = new Intent(
                         MenuAdminActivity.this,

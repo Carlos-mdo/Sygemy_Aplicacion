@@ -28,12 +28,14 @@ import com.aplicacion.gestion_escolar.MenuAdminActivity;
 import com.aplicacion.gestion_escolar.R;
 
 import Datos.AdminSQLiteOpenHelper;
+import Servicios.ServicioAdmin;
 
 public class Fragment_Profesores extends Fragment {
 
     private EditText etNombre,etApellido,etUsuario, etContrasenia, etDni, etSueldo;
-    public String[] generos = {"Seleccionar","Femenino","Masculino"};
 
+    private ServicioAdmin servicio;
+    public String[] generos = {"Seleccionar","Femenino","Masculino"};
     public String[] materias = {
             "Seleccionar",
             "Matemática",
@@ -84,6 +86,8 @@ public class Fragment_Profesores extends Fragment {
 
         datos = new AdminSQLiteOpenHelper(requireContext(), "BD_Sygemy", null, 1);
         baseDeDatos = datos.getWritableDatabase();
+
+        servicio = new ServicioAdmin(requireContext());
 
         etNombre = view.findViewById(R.id.etNombreProfe);
         etApellido = view.findViewById(R.id.etApellidoProfe);
@@ -212,6 +216,69 @@ public class Fragment_Profesores extends Fragment {
         if (etSueldo.getText().toString().trim().isEmpty()) {
             etSueldo.setError("Ingrese el sueldo");
             estado = false;
+        }
+
+        if (servicio.existeDni(etDni.getText().toString().trim())) {
+            etDni.setError("Ese DNI ya está registrado");
+            estado = false;
+        }
+
+        if (servicio.existeUsuario(etUsuario.getText().toString().trim())) {
+            etUsuario.setError("Ese usuario ya existe");
+            estado = false;
+        }
+
+        String dni = etDni.getText().toString().trim();
+
+        if (dni.length() != 8) {
+            etDni.setError("El DNI debe tener 8 dígitos");
+            estado = false;
+        }
+
+        String nombre = etNombre.getText().toString().trim();
+
+        if (!nombre.matches("[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+")) {
+            etNombre.setError("El nombre solo puede contener letras");
+           estado = false;
+        }
+
+        String apellido = etApellido.getText().toString().trim();
+
+        if (!apellido.matches("[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+")) {
+            etApellido.setError("El apellido solo puede contener letras");
+            estado = false;
+        }
+
+        String usuario = etUsuario.getText().toString().trim();
+
+        if (usuario.contains(" ")) {
+            etUsuario.setError("El usuario no puede tener espacios");
+            estado = false;
+        }
+
+//        if (etContrasenia.getText().toString().length() < 6) {
+//            etContrasenia.setError("Debe tener al menos 6 caracteres");
+//            estado= false;
+//        }
+
+        String sueldo = etSueldo.getText().toString().trim();
+
+        if (sueldo.isEmpty()) {
+            etSueldo.setError("Ingrese el sueldo");
+            estado = false;
+        } else {
+            try {
+                double valor = Double.parseDouble(sueldo);
+
+                if (valor <= 0) {
+                    etSueldo.setError("Ingrese un sueldo válido");
+                    estado = false;
+                }
+
+            } catch (NumberFormatException e) {
+                etSueldo.setError("Ingrese un número válido");
+                estado = false;
+            }
         }
 
         return estado;

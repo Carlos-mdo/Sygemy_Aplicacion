@@ -8,11 +8,12 @@ public class Alumno {
     private String genero;
     private String curso;
     private int usuarioId;
+    private int cuotasPagadas;
 
 
     public Alumno(int id, String dni, String nombre,
                     String apellido, String genero,
-                    String curso, int usuarioId) {
+                    String curso, int usuarioId, int cuotasPagadas) {
 
         this.id = id;
         this.dni = dni;
@@ -21,6 +22,7 @@ public class Alumno {
         this.genero = genero;
         this.curso = curso;
         this.usuarioId = usuarioId;
+        this.cuotasPagadas = cuotasPagadas;
     }
 
     public int getId() {
@@ -77,5 +79,13 @@ public class Alumno {
 
     public void setUsuarioId(int usuarioId) {
         this.usuarioId = usuarioId;
+    }
+
+    public int getCuotasPagadas() {
+        return cuotasPagadas;
+    }
+
+    public void setCuotasPagadas(int cuotasPagadas) {
+        this.cuotasPagadas = cuotasPagadas;
     }
 }

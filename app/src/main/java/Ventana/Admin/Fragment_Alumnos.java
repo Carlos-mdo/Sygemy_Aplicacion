@@ -24,6 +24,7 @@ import com.aplicacion.gestion_escolar.MenuAdminActivity;
 import com.aplicacion.gestion_escolar.R;
 
 import Datos.AdminSQLiteOpenHelper;
+import Servicios.ServicioAdmin;
 
 public class Fragment_Alumnos extends Fragment {
 
@@ -33,6 +34,8 @@ public class Fragment_Alumnos extends Fragment {
     public EditText etDni, etNombre, etApellido, etUsuario, etContrasenia;
     public Button btnGuardado;
     public ImageButton btnRegreso;
+    private ServicioAdmin servicio;
+
     protected AdminSQLiteOpenHelper datos;
     protected SQLiteDatabase baseDeDatos;
 
@@ -50,6 +53,8 @@ public class Fragment_Alumnos extends Fragment {
 
         datos = new AdminSQLiteOpenHelper(requireContext(), "BD_Sygemy", null, 1);
         baseDeDatos = datos.getWritableDatabase();
+
+        servicio = new ServicioAdmin(requireContext());
 
         etDni        = view.findViewById(R.id.etDniAlum);
         etNombre     = view.findViewById(R.id.etNombreAlum);
@@ -110,6 +115,7 @@ public class Fragment_Alumnos extends Fragment {
         valorAlumno.put("curso_alum",  spinnerCurso.getSelectedItem().toString());
         valorAlumno.put("genero_alum", spinnerGenero.getSelectedItem().toString());
         valorAlumno.put("usuario_id",  idUsuario);
+        valorAlumno.put("cuotasPagadas_alum", 0);
 
         long idAlumno = baseDeDatos.insert("alumnos", null, valorAlumno);
 
@@ -135,6 +141,8 @@ public class Fragment_Alumnos extends Fragment {
 
     public boolean validacionAlumnos() {
 
+        boolean valido = true;
+
         etDni.setError(null);
         etNombre.setError(null);
         etApellido.setError(null);
@@ -142,36 +150,84 @@ public class Fragment_Alumnos extends Fragment {
         etContrasenia.setError(null);
 
 
-        boolean valido = true;
-
         if (etDni.getText().toString().trim().isEmpty()) {
             etDni.setError("Ingrese el DNI");
             valido = false;
         }
+
         if (etNombre.getText().toString().trim().isEmpty()) {
             etNombre.setError("Ingrese el nombre");
             valido = false;
         }
+
         if (etApellido.getText().toString().trim().isEmpty()) {
             etApellido.setError("Ingrese el apellido");
             valido = false;
         }
-                if (etUsuario.getText().toString().trim().isEmpty()) {
+
+        if (etUsuario.getText().toString().trim().isEmpty()) {
             etUsuario.setError("Ingrese el usuario");
             valido = false;
         }
+
         if (etContrasenia.getText().toString().trim().isEmpty()) {
             etContrasenia.setError("Ingrese la contraseña");
             valido = false;
         }
+
         if (spinnerGenero.getSelectedItemPosition() == 0) {
             Toast.makeText(getContext(), "Seleccione un género", Toast.LENGTH_SHORT).show();
             valido = false;
         }
+
         if (spinnerCurso.getSelectedItemPosition() == 0) {
             Toast.makeText(getContext(), "Seleccione un curso", Toast.LENGTH_SHORT).show();
             valido = false;
         }
+
+        if (servicio.existeDni(etDni.getText().toString().trim())) {
+            etDni.setError("Ese DNI ya está registrado");
+            valido = false;
+        }
+
+        if (servicio.existeUsuario(etUsuario.getText().toString().trim())) {
+            etUsuario.setError("Ese usuario ya existe");
+            valido = false;
+        }
+
+        String dni = etDni.getText().toString().trim();
+
+        if (!dni.matches("\\d{8}")) {
+            etDni.setError("El DNI debe tener 8 números");
+            valido = false;
+        }
+
+        String nombre = etNombre.getText().toString().trim();
+
+        if (!nombre.matches("[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+")) {
+            etNombre.setError("El nombre solo puede contener letras");
+            valido = false;
+        }
+
+        String apellido = etApellido.getText().toString().trim();
+
+        if (!apellido.matches("[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+")) {
+            etApellido.setError("El apellido solo puede contener letras");
+            valido = false;
+        }
+
+        String usuario = etUsuario.getText().toString().trim();
+
+        if (usuario.contains(" ")) {
+            etUsuario.setError("El usuario no puede contener espacios");
+            valido = false;
+        }
+
+
+//    if (etContrasenia.getText().toString().length() < 6) {
+//        etContrasenia.setError("La contraseña debe tener al menos 6 caracteres");
+//        valido = false;
+//    }
 
         return valido;
     }
