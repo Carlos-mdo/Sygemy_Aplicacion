@@ -27,6 +27,7 @@ public class ActAdapter extends RecyclerView.Adapter<ActAdapter.ViewHolder> {
     private final Context context;
     private final int alumnoId;
     private final Fragment_Material fragment;
+
     public ActAdapter(List<Actividad> lista, Context context, int alumnoId, Fragment_Material fragment) {
         this.lista = lista;
         this.context = context;
@@ -44,8 +45,7 @@ public class ActAdapter extends RecyclerView.Adapter<ActAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull ViewHolder vHolder, int posicion) {
         Actividad act = lista.get(posicion);
-        vHolder.tvTipo.setText(act.getTipo());
-        vHolder.tvTitulo.setText(act.getTitulo());
+        vHolder.tvTitulo.setText(act.getTipo() + " - " + act.getTitulo());
         vHolder.tvDescripcion.setText(act.getDescripcion());
         vHolder.tvFecha.setText(act.getFecha());
 
@@ -54,36 +54,43 @@ public class ActAdapter extends RecyclerView.Adapter<ActAdapter.ViewHolder> {
             vHolder.tvAdjunto.setVisibility(View.VISIBLE);
             vHolder.tvAdjunto.setOnClickListener(v -> {
                 Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(act.getEnlace()));
-                context.startActivity(intent);
+                vHolder.itemView.getContext().startActivity(intent);
             });
         } else if (act.getArchivoUrl() != null && !act.getArchivoUrl().isEmpty()) {
             vHolder.tvAdjunto.setText(act.getArchivoNombre());
             vHolder.tvAdjunto.setVisibility(View.VISIBLE);
             vHolder.tvAdjunto.setOnClickListener(v -> {
                 try {
+                    android.content.Context ctx = vHolder.itemView.getContext(); // CAMBIO: usar el context de la vista, no el campo de instancia
                     Uri uri = Uri.parse(act.getArchivoUrl());
-                    String mime = context.getContentResolver().getType(uri);
+                    String mime = ctx.getContentResolver().getType(uri);
                     Intent intent = new Intent(Intent.ACTION_VIEW);
                     intent.setDataAndType(uri, mime != null ? mime : "*/*");
                     intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    context.startActivity(intent);
+                    ctx.startActivity(intent);
                 } catch (Exception e) {
-                    Toast.makeText(context, "No se puede abrir el archivo", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(vHolder.itemView.getContext(), "No se puede abrir el archivo", Toast.LENGTH_SHORT).show();
                 }
             });
         } else { vHolder.tvAdjunto.setVisibility(View.GONE); }
-        EntregaDao entregaDao = new EntregaDao(context);
-        boolean yaEntrego     = entregaDao.yaEntrego(act.getId(), alumnoId);
 
-        if (yaEntrego) {
-            vHolder.btnEntregar.setText("Entregado");
-            vHolder.btnEntregar.setEnabled(false);
+        if (context != null && fragment != null) {
+            EntregaDao entregaDao = new EntregaDao(context);
+            boolean yaEntrego = entregaDao.yaEntrego(act.getId(), alumnoId);
+
+            vHolder.btnEntregar.setVisibility(View.VISIBLE);
+            if (yaEntrego) {
+                vHolder.btnEntregar.setText("Entregado");
+                vHolder.btnEntregar.setEnabled(false);
+            } else {
+                vHolder.btnEntregar.setText("Entregar");
+                vHolder.btnEntregar.setEnabled(true);
+                vHolder.btnEntregar.setOnClickListener(v ->
+                        fragment.ventanaEntrega(act.getId())
+                );
+            }
         } else {
-            vHolder.btnEntregar.setText("Entregar");
-            vHolder.btnEntregar.setEnabled(true);
-            vHolder.btnEntregar.setOnClickListener(v ->
-                    fragment.ventanaEntrega(act.getId())
-            );
+            vHolder.btnEntregar.setVisibility(View.GONE);
         }
     }
 

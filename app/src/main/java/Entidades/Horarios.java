@@ -8,7 +8,6 @@ public class Horarios {
     private int profesorId;
     private String profesorNombre;
 
-    // Constructor para ALTA (insertar un horario nuevo, solo se guarda el id del profesor)
     public Horarios(String curso, String materia, String dia, String horaInicio, String horaFin, int profesorId) {
         this.curso = curso;
         this.materia = materia;
@@ -18,7 +17,6 @@ public class Horarios {
         this.profesorId = profesorId;
     }
 
-    // Constructor para LECTURA (viene de la base, incluye id del horario y nombre del profesor)
     public Horarios(int idHorario, String curso, String materia, String dia, String horaInicio, String horaFin,
                     int profesorId, String profesorNombre) {
         this.idHorario = idHorario;

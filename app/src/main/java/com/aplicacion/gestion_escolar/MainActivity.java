@@ -21,7 +21,6 @@ import Servicios.ServicioUsuario;
 public class MainActivity extends AppCompatActivity {
 
     protected EditText etUsuario, etContrasenia;
-    ServicioAdmin servAdmin;
     ServicioUsuario servUsuario;
     public Usuarios rol;
 
@@ -36,7 +35,6 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-//        servAdmin = new ServicioAdmin(this);
         servUsuario = new ServicioUsuario(this);
         etUsuario = findViewById(R.id.editTextUsuario);
         etContrasenia = findViewById(R.id.editTextContrasenia);
@@ -53,7 +51,6 @@ public class MainActivity extends AppCompatActivity {
             etUsuario.setError("Ingrese Usuario");
             estado = false;
         }
-
         if(etContrasenia.getText().toString().isEmpty()){
             etContrasenia.setError("Ingrese la contraseña");
             estado = false;
@@ -80,6 +77,12 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(this, MenuAdminActivity.class);
                 startActivity(intent);
             } else if (rolTexto.equals("profesor")) {
+                Datos.CursosDao cursosDao = new Datos.CursosDao(this);
+                int profesorId = cursosDao.obtenerProfesorIdPorUsuario(rol.getId());
+                String materia = cursosDao.obtenerDatosProfesor(profesorId)[1];
+                cursosDao.cerrar();
+
+                Datos.UsuarioDao.guardarProfesor(this, profesorId, materia);
                 guardarRol("profe");
                 Intent intent = new Intent(this, MenuUsuarioActivity.class);
                 startActivity(intent);
@@ -87,6 +90,7 @@ public class MainActivity extends AppCompatActivity {
                 int alumnoId = obtenerAlumnoIdPorUsuario(rol.getId());
                 Datos.UsuarioDao.guardarAlumno(this, alumnoId);
                 guardarRol("alumn");
+
                 Intent intent = new Intent(this, MenuUsuarioActivity.class);
                 startActivity(intent);
             } else {
@@ -110,10 +114,7 @@ public class MainActivity extends AppCompatActivity {
     private int obtenerAlumnoIdPorUsuario(int usuarioId) {
         Datos.AdminSQLiteOpenHelper admin = new Datos.AdminSQLiteOpenHelper(this, "BD_Sygemy", null, 1);
         android.database.sqlite.SQLiteDatabase db = admin.getReadableDatabase();
-        android.database.Cursor cursor = db.rawQuery(
-                "SELECT id FROM alumnos WHERE usuario_id = ?",
-                new String[]{ String.valueOf(usuarioId) });
-
+        android.database.Cursor cursor = db.rawQuery("SELECT id FROM alumnos WHERE usuario_id = ?", new String[]{ String.valueOf(usuarioId) });
         int id = -1;
         if (cursor.moveToFirst()) { id = cursor.getInt(0); }
         cursor.close();

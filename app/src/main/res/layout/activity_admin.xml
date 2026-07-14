@@ -7,84 +7,140 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <FrameLayout
+    <LinearLayout
+        android:id="@+id/main"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="#F5F6FA"
+        tools:context=".MenuAdminActivity">
 
-        <ScrollView
-            android:id="@+id/scrollBienvenAdmin"
+        <!-- Topbar FIJA: mismo estilo que MenuUsuarioActivity -->
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fillViewport="true">
+            android:layout_height="wrap_content"
+            android:background="#5B4B8A"
+            android:elevation="2dp"
+            android:paddingBottom="12dp">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/main"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                tools:context=".MenuAdminActivity">
+            <ImageButton
+                android:id="@+id/iBtnMenuAdmin"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:background="@android:color/transparent"
+                android:scaleType="centerInside"
+                android:contentDescription="Abrir menÃº"
+                app:tint="#FFFFFF"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/menu_icon_tres_lineas" />
 
-                <TextView
-                    android:id="@+id/textView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Panel Administrador"
-                    android:textSize="30sp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.17" />
+            <TextView
+                android:id="@+id/txtUsuario"
+                android:layout_width="233dp"
+                android:layout_height="24dp"
+                android:layout_marginStart="12dp"
+                android:ellipsize="end"
+                android:gravity="end"
+                android:maxLines="1"
+                android:text="Administrador"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.548"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.666"
+                tools:text="Administrador" />
 
-                <TextView
-                    android:id="@+id/txtUsuario"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Administrador"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.76"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.053" />
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardAvatar"
+                android:layout_width="46dp"
+                android:layout_height="46dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="14dp"
+                app:cardCornerRadius="23dp"
+                app:cardElevation="2dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
                 <ImageView
                     android:id="@+id/imageView"
-                    android:layout_width="53dp"
-                    android:layout_height="57dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.955"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.023"
-                    tools:srcCompat="@tools:sample/avatars" />
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#EEEEEE"
+                    android:contentDescription="Foto de perfil"
+                    android:padding="6dp"
+                    android:scaleType="centerCrop"
+                    app:srcCompat="@drawable/ic_default_avatar" />
 
-                <ImageButton
-                    android:id="@+id/iBtnMenuAdmin"
-                    android:layout_width="53dp"
-                    android:layout_height="52dp"
-                    android:background="@android:color/transparent"
-                    android:scaleType="centerInside"
-                    android:contentDescription="Abrir menú"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.043"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.023"
-                    app:srcCompat="@drawable/menu_icon_tres_lineas" />
+            </com.google.android.material.card.MaterialCardView>
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-        </ScrollView>
-
+        <!-- Debajo de la topbar fija: o la bienvenida, o el fragment cargado -->
         <FrameLayout
-        android:id="@+id/contenFragmentAdmin"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone" />
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
 
-    </FrameLayout>
+            <ScrollView
+                android:id="@+id/scrollBienvenAdmin"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fillViewport="true">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/contenidoBienvenidaAdmin"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <!-- Saludo -->
+                    <TextView
+                        android:id="@+id/textView"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="24dp"
+                        android:paddingHorizontal="20dp"
+                        android:text="Panel Administrador"
+                        android:textColor="#1A1A1A"
+                        android:textSize="24sp"
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/tvSubtituloBienvenidaAdmin"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:paddingHorizontal="20dp"
+                        android:text="Este es tu resumen de hoy"
+                        android:textColor="#777777"
+                        android:textSize="14sp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/textView" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </ScrollView>
+
+            <FrameLayout
+                android:id="@+id/contenFragmentAdmin"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#F5F6FA"
+                android:visibility="gone" />
+
+        </FrameLayout>
+
+    </LinearLayout>
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navigationView"

@@ -11,6 +11,10 @@ import Entidades.Actividad;
 
 public class ActividadDao {
     private final AdminSQLiteOpenHelper baseDeDatos;
+    private static final java.util.concurrent.ExecutorService executor =
+            java.util.concurrent.Executors.newSingleThreadExecutor();
+    private static final android.os.Handler mainHandler =
+            new android.os.Handler(android.os.Looper.getMainLooper());
 
     public ActividadDao(Context context) {
         baseDeDatos = new AdminSQLiteOpenHelper(context,"BD_Sygemy",null,1);
@@ -48,5 +52,18 @@ public class ActividadDao {
         fila.close();
         bd.close();
         return listAct;
+    }
+    public void obtenerTodasAsync(java.util.function.Consumer<List<Actividad>> callback) {
+        executor.execute(() -> {
+            List<Actividad> resultado = obtenerTodas();
+            mainHandler.post(() -> callback.accept(resultado));
+        });
+    }
+
+    public void insertarAsync(Actividad actividad, java.util.function.Consumer<Boolean> callback) {
+        executor.execute(() -> {
+            boolean resultado = insertar(actividad);
+            mainHandler.post(() -> callback.accept(resultado));
+        });
     }
 }

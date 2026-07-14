@@ -2,6 +2,7 @@ package Entidades;
 
 public class EntregaPendiente {
     public int entrega_id, actividad_id, alumno_id, trimestreId;
+
     public String titulo_Actividad, nombre_Alum, curso_Alum, url_Ent, arch_Nombre, arch_Url, fecha_Ent, comentario, trimestreNombre;
     public Double nota;
     public boolean corregida = false;

@@ -2,6 +2,10 @@ package Ventana.Admin;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageButton;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -9,33 +13,30 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageButton;
-
 import com.aplicacion.gestion_escolar.MenuAdminActivity;
 import com.aplicacion.gestion_escolar.R;
 
 import java.util.List;
 
+import Adapter.AlumnoAdapter;
 import Adapter.ProfesorAdapter;
+import Entidades.Alumno;
 import Entidades.Profesor;
-import Entidades.Usuarios;
 import Servicios.ServicioAdmin;
 
-public class Fragment_DetalleProfesores extends Fragment {
+public class Fragment_DetalleAlumnos extends Fragment {
 
     private ServicioAdmin servicioAdmin;
-    private List<Profesor> listProfesores;
-    private RecyclerView recyclerProfesores;
+    private List<Alumno> listAlumnos;
+    private RecyclerView recyclerAlumnos;
     private ImageButton btnRegreso;
 
-    public Fragment_DetalleProfesores() {
+    public Fragment_DetalleAlumnos() {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
 
         return inflater.inflate(R.layout.fragment__detalleusuarios, container, false);
     }
@@ -46,15 +47,15 @@ public class Fragment_DetalleProfesores extends Fragment {
 
         servicioAdmin = new ServicioAdmin(getContext());
 
-        listProfesores = servicioAdmin.BuscarTodosProfesores();
+        listAlumnos = servicioAdmin.BuscarTodosAlumnos();
 
-        recyclerProfesores = view.findViewById(R.id.recyclerUsuarios);
+        recyclerAlumnos = view.findViewById(R.id.recyclerUsuarios);
 
-        recyclerProfesores.setLayoutManager(new GridLayoutManager(getContext(), 2));
+        recyclerAlumnos.setLayoutManager(new GridLayoutManager(getContext(), 2));
 
-        ProfesorAdapter adapter = new ProfesorAdapter(listProfesores,servicioAdmin);
+        AlumnoAdapter adapter = new AlumnoAdapter(listAlumnos,servicioAdmin);
 
-        recyclerProfesores.setAdapter(adapter);
+        recyclerAlumnos.setAdapter(adapter);
 
         btnRegreso = view.findViewById(R.id.btnRegresoDetalles);
 

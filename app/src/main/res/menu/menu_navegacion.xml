@@ -43,7 +43,7 @@
         android:visible="false">
 
         <item
-            android:id="@+id/nav_cursos"
+            android:id="@+id/nav_cursos_profe"
             android:title="Cursos"/>
 
         <item
@@ -73,6 +73,12 @@
         <item
             android:id="@+id/nav_detalles"
             android:title="Detalles"/>
+        <item
+            android:id="@+id/nav_hora_admin"
+            android:title="Horarios"/>
+        <item
+            android:id="@+id/nav_detalle_curso"
+            android:title="Ver cursos"/>
 
     </group>
 

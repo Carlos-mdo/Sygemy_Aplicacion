@@ -29,15 +29,27 @@ public class AdminSQLiteOpenHelper extends SQLiteOpenHelper{
         Usuarios admin = new Usuarios("admin","admin123","admin");
         BaseDeDatos.insert("usuarios",null,admin.Valores());
 
+        BaseDeDatos.execSQL("CREATE TABLE cursos (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "nombre TEXT NOT NULL UNIQUE)");
+
+        String[] cursosIniciales = {"1er Grado", "2do Grado", "3er Grado", "4to Grado", "5to Grado", "6to Grado"};
+        for (String c : cursosIniciales) {
+            ContentValues cv = new ContentValues();
+            cv.put("nombre", c);
+            BaseDeDatos.insert("cursos", null, cv);
+        }
+
         BaseDeDatos.execSQL("CREATE TABLE profesores (" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "dni_prof TEXT UNIQUE NOT NULL," +
                 "nombre_prof TEXT NOT NULL," +
                 "apellido_prof TEXT NOT NULL," +
                 "genero_prof TEXT," +
-                "materia TEXT," +
+                "materia_prof TEXT," +
                 "usuario_id INTEGER," +
-                "sueldo_id MONEY," +
+                "sueldo_prof REAL," +
+                "foto_prof TEXT," +
                 "FOREIGN KEY(usuario_id) REFERENCES usuarios(id))");
 
         BaseDeDatos.execSQL("CREATE TABLE alumnos ("+
@@ -47,6 +59,7 @@ public class AdminSQLiteOpenHelper extends SQLiteOpenHelper{
                 "apellido_alum TEXT NOT NULL," +
                 "curso_alum TEXT NOT NULL," +
                 "genero_alum TEXT," +
+                "foto_alum TEXT," +
                 "usuario_id INTEGER," +
                 "FOREIGN KEY(usuario_id) REFERENCES usuarios(id))");
 
@@ -106,15 +119,15 @@ public class AdminSQLiteOpenHelper extends SQLiteOpenHelper{
                 "profesor_id INTEGER," +
                 "FOREIGN KEY(profesor_id) REFERENCES profesores(id))");
 
-        ContentValues profeValores = new ContentValues();
-        profeValores.put("dni_prof", "00000000");
-        profeValores.put("nombre_prof", "Carlos");
-        profeValores.put("apellido_prof", "Ejemplo");
-        profeValores.put("materia", "Matematica");
-        long profesorId = BaseDeDatos.insert("profesores", null, profeValores);
-
-        Horarios hora = new Horarios("6to_grado","Matematica","Lunes","09:00","11:00", (int) profesorId);
-        BaseDeDatos.insert("horarios",null,hora.Valores());
+//        ContentValues profeValores = new ContentValues();
+//        profeValores.put("dni_prof", "00000000");
+//        profeValores.put("nombre_prof", "Carlos");
+//        profeValores.put("apellido_prof", "Ejemplo");
+//        profeValores.put("materia_prof", "Matematica");
+//        long profesorId = BaseDeDatos.insert("profesores", null, profeValores);
+//
+//        Horarios hora = new Horarios("6to_grado","Matematica","Lunes","09:00","11:00", (int) profesorId);
+//        BaseDeDatos.insert("horarios",null,hora.Valores());
 
         BaseDeDatos.execSQL("INSERT INTO trimestres (nombre) VALUES ('1° Trimestre')");
         BaseDeDatos.execSQL("INSERT INTO trimestres (nombre) VALUES ('2° Trimestre')");
@@ -131,6 +144,7 @@ public class AdminSQLiteOpenHelper extends SQLiteOpenHelper{
         BaseDeDatos.execSQL("DROP TABLE IF EXISTS actividad");
         BaseDeDatos.execSQL("DROP TABLE IF EXISTS entregas");
         BaseDeDatos.execSQL("DROP TABLE IF EXISTS horarios");
+        BaseDeDatos.execSQL("DROP TABLE IF EXISTS cursos");
 
         onCreate(BaseDeDatos);
     }

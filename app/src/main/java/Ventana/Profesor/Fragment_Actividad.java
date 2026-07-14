@@ -11,6 +11,8 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.provider.OpenableColumns;
 import android.view.LayoutInflater;
@@ -21,6 +23,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,6 +34,7 @@ import com.aplicacion.gestion_escolar.R;
 import java.util.ArrayList;
 import java.util.List;
 
+import Adapter.ActAdapter;
 import Datos.ActividadDao;
 import Datos.AdminSQLiteOpenHelper;
 import Entidades.Actividad;
@@ -41,18 +45,21 @@ public class Fragment_Actividad extends FragmentBase {
     private Button btnDesplegar;
     private Uri archiUrl;
     private String archiNombre;
-    private ActivityResultLauncher<String> selectArchi;
+    private ActivityResultLauncher<String[]> selectArchi;
     private AdminSQLiteOpenHelper admin;
     private LinearLayout layoutArchiSelec;
     private TextView tvNombreArchivo;
     private String materia_profe;
+    private RecyclerView rvActividades;
+    private ProgressBar progressActividades;
+    private ActAdapter adapter;
+    private final List<Actividad> listaActividades = new ArrayList<>();
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        selectArchi = registerForActivityResult(
-                new ActivityResultContracts.GetContent(),
+        selectArchi = registerForActivityResult(new ActivityResultContracts.OpenDocument(),
                 uri -> {
                     if (uri != null) {
                         archiUrl    = uri;
@@ -75,9 +82,30 @@ public class Fragment_Actividad extends FragmentBase {
         btnDesplegar.setOnClickListener(view1 -> mostrarMenu(view1));
         materia_profe = Datos.UsuarioDao.obtenerMateria(requireContext());
         vincularBotonMenu(view, R.id.iBtnMenu);
+
+        rvActividades = view.findViewById(R.id.rvActividades);
+        progressActividades = view.findViewById(R.id.progressActividades);
+        rvActividades.setLayoutManager(new LinearLayoutManager(requireContext()));
+
+        adapter = new ActAdapter(listaActividades, requireContext(), -1, null);
+        rvActividades.setAdapter(adapter);
+        cargarActividades();
         return view;
     }
+    private void cargarActividades() {
+        if (adapter == null) return;
 
+        progressActividades.setVisibility(View.VISIBLE);
+        ActividadDao dao = new ActividadDao(requireContext());
+        dao.obtenerTodasAsync(resultado -> {
+            if (!isAdded()|| adapter == null) return;
+
+            listaActividades.clear();
+            listaActividades.addAll(resultado);
+            adapter.notifyDataSetChanged();
+            progressActividades.setVisibility(View.GONE);
+        });
+    }
     private void mostrarMenu(View view) {
         PopupMenu popOpciones = new PopupMenu(requireContext(), view);
         popOpciones.getMenu().add(0, 1, 0, "Tarea");
@@ -104,19 +132,31 @@ public class Fragment_Actividad extends FragmentBase {
     }
 
     private void mostrarMensaje(String tipo) {
-        archiUrl    = null;
+        archiUrl = null;
         archiNombre = null;
-        View ventFlotante = LayoutInflater.from(requireContext()).inflate(R.layout.view_mensaje, null);
+        View ventFlotante = LayoutInflater.from(requireContext()).inflate(R.layout.item_actividad_profe, null);
 
         EditText etTitulo      = ventFlotante.findViewById(R.id.etTitulo);
         EditText etDescripcion = ventFlotante.findViewById(R.id.etDescripcion);
         EditText etFecha       = ventFlotante.findViewById(R.id.etFecha);
         EditText etUrl         = ventFlotante.findViewById(R.id.etEnlace);
         Button btnSelecArchi   = ventFlotante.findViewById(R.id.btnSelecArchi);
+
         layoutArchiSelec       = ventFlotante.findViewById(R.id.layoutArchiSelec);
         tvNombreArchivo        = ventFlotante.findViewById(R.id.tvNomArchi);
         ImageButton btnElimina = ventFlotante.findViewById(R.id.btnEliminaArchi);
         Spinner spinnerTrimestre = ventFlotante.findViewById(R.id.spinnerTrimestreAct);
+
+        etFecha.setFocusable(false);
+        etFecha.setOnClickListener(v -> {
+            java.util.Calendar cal = java.util.Calendar.getInstance();
+            new android.app.DatePickerDialog(requireContext(), (view1, year, month, day) -> {
+                String fechaFormateada = String.format(java.util.Locale.getDefault(),
+                        "%02d/%02d/%04d", day, month + 1, year);
+                etFecha.setText(fechaFormateada);
+            }, cal.get(java.util.Calendar.YEAR), cal.get(java.util.Calendar.MONTH), cal.get(java.util.Calendar.DAY_OF_MONTH))
+                    .show();
+        });
 
         List<Integer> trimestreIds = new ArrayList<>();
         List<String> trimestreNombres = new ArrayList<>();
@@ -126,7 +166,7 @@ public class Fragment_Actividad extends FragmentBase {
         adapterTrim.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerTrimestre.setAdapter(adapterTrim);
 
-        btnSelecArchi.setOnClickListener(v -> selectArchi.launch("*/*"));
+        btnSelecArchi.setOnClickListener(v -> selectArchi.launch(new String[]{"*/*"}));
 
         btnElimina.setOnClickListener(v -> {
             archiUrl    = null;
@@ -169,7 +209,7 @@ public class Fragment_Actividad extends FragmentBase {
                         adjunInfo = "Sin adjunto";
                     }
 
-                    guardarActividad(tipo, titulo, descripcion, fecha, url, archiUrl, archiNombre, trimestreId);
+                    guardarActividad(tipo, titulo, descripcion, fecha, url, archiUrl, archiNombre, trimestreId, adjunInfo);
                     Toast.makeText(requireContext(),tipo + " guardado: " + titulo + " " + adjunInfo, Toast.LENGTH_SHORT).show();
                 }).setNegativeButton("Cancelar", (dialog, which) -> {
                     layoutArchiSelec = null;
@@ -190,7 +230,7 @@ public class Fragment_Actividad extends FragmentBase {
         fila.close();
         bd_trimesAct.close();
     }
-    private void guardarActividad( String tipo, String titulo, String descripcion, String fecha, String url, Uri archivoUrl, String archivoNombre, int trimestreId) {
+    private void guardarActividad( String tipo, String titulo, String descripcion, String fecha, String url, Uri archivoUrl, String archivoNombre, int trimestreId, String adjunInfo) {
 
         android.util.Log.d("Actividad", "Tipo: " + tipo);
         android.util.Log.d("Actividad", "Título: " + titulo);
@@ -226,5 +266,12 @@ public class Fragment_Actividad extends FragmentBase {
             }
         } catch (Exception e) { e.printStackTrace(); }
         return nombArchi;
+    }
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        adapter = null;          // NUEVO
+        rvActividades = null;    // NUEVO
+        progressActividades = null; // NUEVO
     }
 }

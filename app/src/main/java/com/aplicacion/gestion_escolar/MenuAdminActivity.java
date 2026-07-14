@@ -20,7 +20,9 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import Ventana.Admin.Fragment_Alumnos;
+import Ventana.Admin.Fragment_DetalleCursos;
 import Ventana.Admin.Fragment_DetalleUsuarios;
+import Ventana.Admin.Fragment_Horarios_Admin;
 import Ventana.Admin.Fragment_MenuDetalles;
 import Ventana.Admin.Fragment_Profesores;
 import com.google.android.material.navigation.NavigationView;
@@ -76,6 +78,18 @@ public class MenuAdminActivity extends AppCompatActivity implements ControllerDr
             }
             if (id == R.id.nav_detalles) {
                 cargarFragment(new Fragment_MenuDetalles());
+                return true;
+            }
+            if (id == R.id.nav_hora_admin) {
+                cargarFragment(new Fragment_Horarios_Admin());
+                return true;
+            }
+            if (id == R.id.nav_detalle_curso) {
+                cargarFragment(new Fragment_DetalleCursos());
+                return true;
+            }
+            if (id == R.id.nav_pagos) {
+                cargarFragment(new Fragment_Pagos());
                 return true;
             }
             if (id == R.id.nav_cerrar) {

@@ -271,8 +271,7 @@ public class Fragment_Calificaciones extends Fragment {
             tvTrimestre.setText("Trimestre: " + entrega.trimestreNombre);
 
             TextView tvComentario = new TextView(requireContext());
-            tvComentario.setText("Comentario: " +
-                    (entrega.comentario != null && !entrega.comentario.isEmpty() ? entrega.comentario : "Sin comentario"));
+            tvComentario.setText("Comentario: " + (entrega.comentario != null && !entrega.comentario.isEmpty() ? entrega.comentario : "Sin comentario"));
 
             TextView tvAdjunto = new TextView(requireContext());
             boolean tieneUrl     = entrega.url_Ent != null && !entrega.url_Ent.isEmpty();

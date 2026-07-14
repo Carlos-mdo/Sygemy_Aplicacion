@@ -82,7 +82,6 @@ public class Fragment_Material extends Fragment {
         AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(requireContext(), "BD_Sygemy", null, 1);
         bd = admin.getWritableDatabase();
 
-        // Trimestre vigente según la fecha de hoy
         trimestreActualId = obtenerTrimestreIdActual(bd);
 
         List<Actividad> listActFiltrada = new ArrayList<>();
@@ -91,7 +90,7 @@ public class Fragment_Material extends Fragment {
                 listActFiltrada.add(act);
             }
         }
-        rvAct.setAdapter(new ActAdapter(listAct, requireContext(),alumId,this));
+        rvAct.setAdapter(new ActAdapter(listActFiltrada, requireContext(), alumId, this));
 
         return view;
     }
@@ -129,7 +128,6 @@ public class Fragment_Material extends Fragment {
                             e.printStackTrace();
                         }
                     }
-
                     String fecha = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(new Date(System.currentTimeMillis()));
                     Entrega ent = new Entrega(actividadId, alumId, url, archiNomb != null ? archiNomb : "", archiUrl != null ? archiUrl.toString() : "", fecha, coment);
 
@@ -160,7 +158,6 @@ public class Fragment_Material extends Fragment {
         if (!hoy.before(inicio2) && !hoy.after(fin2)) return 2;
         if (!hoy.before(inicio3) && !hoy.after(fin3)) return 3;
 
-        // Fuera de rango: antes de marzo cae en el 1°, después de diciembre en el 3°
         return hoy.before(inicio1) ? 1 : 3;
     }
     private Calendar crearFecha(int anio, int mes, int dia) {

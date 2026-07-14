@@ -29,13 +29,12 @@ public class Fragment_DetalleUsuarios extends Fragment {
     private List<Usuarios> listUsuarios;
     private RecyclerView recyclerUsuarios;
     private ImageButton btnRegreso;
+    private  UsuarioAdapter adapter;
 
-    public Fragment_DetalleUsuarios() {
-    }
+    public Fragment_DetalleUsuarios() {}
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         return inflater.inflate(R.layout.fragment__detalleusuarios, container, false);
     }
@@ -62,5 +61,20 @@ public class Fragment_DetalleUsuarios extends Fragment {
             Intent intent = new Intent(requireContext(), MenuAdminActivity.class);
             startActivity(intent);
         });
+    }
+    private void actualizarUsuarios() {
+
+        adapter.actualizarLista(
+                servicioAdmin.BuscarTodosUsuarios()
+        );
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if (adapter != null) {
+            actualizarUsuarios();
+        }
     }
 }

@@ -28,30 +28,37 @@ import com.aplicacion.gestion_escolar.MenuAdminActivity;
 import com.aplicacion.gestion_escolar.R;
 
 import Datos.AdminSQLiteOpenHelper;
+import Servicios.ServicioAdmin;
 
 public class Fragment_Profesores extends Fragment {
 
-    private EditText etNombre,etApellido,etUsuario, etContrasenia, etDni, etMateria;
+    private EditText etNombre,etApellido,etUsuario, etContrasenia, etDni, etSueldo;
     public String[] generos = {"Seleccionar","Femenino","Masculino"};
-    public Spinner spinnerGenero;
+    public String[] materias = {
+            "Seleccionar",
+            "Matemática",
+            "Lengua",
+            "Historia",
+            "Geografía",
+            "Biología",
+            "Física",
+            "Química",
+            "Inglés",
+            "Educación Física",
+            "Informática"
+    };
+    public Spinner spinnerGenero, spinnerMateria;
     public TextView txtErrorGenero;
     public Button btnGuardar;
     public ImageButton btnRegreso;
     public ContentValues contentValues = new ContentValues();
     public ContentValues contentValuesProfe = new ContentValues();
-    public  AdminSQLiteOpenHelper datos;
+    public AdminSQLiteOpenHelper datos;
+    public ServicioAdmin servicio;
     public SQLiteDatabase baseDeDatos;
     public boolean estado;
 
-    public Fragment_Profesores() {
-    }
-
-    public static Fragment_Profesores newInstance(String param1, String param2) {
-        Fragment_Profesores fragment = new Fragment_Profesores();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
-        return fragment;
-    }
+    public Fragment_Profesores() {}
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -59,8 +66,7 @@ public class Fragment_Profesores extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment__profesores, container, false);
     }
 
@@ -71,13 +77,16 @@ public class Fragment_Profesores extends Fragment {
         datos = new AdminSQLiteOpenHelper(requireContext(), "BD_Sygemy", null, 1);
         baseDeDatos = datos.getWritableDatabase();
 
+        servicio = new ServicioAdmin(requireContext());
+
         etNombre = view.findViewById(R.id.etNombreProfe);
         etApellido = view.findViewById(R.id.etApellidoProfe);
         etUsuario = view.findViewById(R.id.etUsuarioProfe);
         etContrasenia = view.findViewById(R.id.etContraseniaProfe);
         etDni = view.findViewById(R.id.etDniProfe);
-        etMateria = view.findViewById(R.id.etMateriaProfe);
+        etSueldo = view.findViewById(R.id.etSueldoProfe);
         spinnerGenero = view.findViewById(R.id.spinGenero);
+        spinnerMateria = view.findViewById(R.id.spinMateria);
 
         ArrayAdapter<String> array = new ArrayAdapter<String>(requireContext(), android.R.layout.simple_spinner_item,generos);
 
@@ -85,10 +94,14 @@ public class Fragment_Profesores extends Fragment {
 
         spinnerGenero.setAdapter(array);
 
+        ArrayAdapter<String> adapterMateria = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, materias);
+
+        adapterMateria.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        spinnerMateria.setAdapter(adapterMateria);
+
         btnGuardar = view.findViewById(R.id.btnAgregarProfe);
         btnRegreso = view.findViewById(R.id.btnRegresoProfe);
-
-        //btnGuardar.setOnClickListener(view1 -> guardarProfesor());
 
         btnRegreso.setOnClickListener(v -> {
             baseDeDatos.close();
@@ -101,7 +114,6 @@ public class Fragment_Profesores extends Fragment {
                 guardarProfesor();
             }
         });
-
     }
     public void guardarProfesor() {
 
@@ -114,11 +126,18 @@ public class Fragment_Profesores extends Fragment {
 
         long idUsuario = baseDeDatos.insert("usuarios",null,contentValues);
 
+        if (idUsuario == -1) {
+            Toast.makeText(getContext(),"El usuario ya existe", Toast.LENGTH_SHORT).show();
+            etUsuario.setError("Usuario ya registrado");
+            return;
+        }
+
         contentValuesProfe.put("dni_prof",etDni.getText().toString());
         contentValuesProfe.put("nombre_prof",etNombre.getText().toString());
         contentValuesProfe.put("apellido_prof",etApellido.getText().toString());
-        contentValuesProfe.put("materia",etMateria.getText().toString());
+        contentValuesProfe.put("materia_prof",spinnerMateria.getSelectedItem().toString());
         contentValuesProfe.put("genero_prof", spinnerGenero.getSelectedItem().toString());
+        contentValuesProfe.put("sueldo_prof", Double.parseDouble(etSueldo.getText().toString()));
         contentValuesProfe.put("usuario_id", idUsuario);
 
         baseDeDatos.insert("profesores",null,contentValuesProfe);
@@ -128,11 +147,10 @@ public class Fragment_Profesores extends Fragment {
         etUsuario.setText("");
         etContrasenia.setText("");
         etDni.setText("");
-        etMateria.setText("");
+        etSueldo.setText("");
+        spinnerMateria.setSelection(0);
         spinnerGenero.setSelection(0);
-
     }
-
     public boolean ValidacionProfesores(){
         estado = true;
 
@@ -165,6 +183,76 @@ public class Fragment_Profesores extends Fragment {
         if(spinnerGenero.getSelectedItemPosition() == 0){
             Toast.makeText(getContext(), "Seleccione un género", Toast.LENGTH_SHORT).show();
             estado = false;
+        }
+
+        if (spinnerMateria.getSelectedItemPosition() == 0) {
+            Toast.makeText(getContext(),
+                    "Seleccione una materia",
+                    Toast.LENGTH_SHORT).show();
+            estado = false;
+        }
+
+        if (etSueldo.getText().toString().trim().isEmpty()) {
+            etSueldo.setError("Ingrese el sueldo");
+            estado = false;
+        }
+
+        if (servicio.existeDni(etDni.getText().toString().trim())) {
+            etDni.setError("Ese DNI ya está registrado");
+            estado = false;
+        }
+
+        if (servicio.existeUsuario(etUsuario.getText().toString().trim())) {
+            etUsuario.setError("Ese usuario ya existe");
+            estado = false;
+        }
+
+        String dni = etDni.getText().toString().trim();
+
+        if (dni.length() != 8) {
+            etDni.setError("El DNI debe tener 8 dígitos");
+            estado = false;
+        }
+
+        String nombre = etNombre.getText().toString().trim();
+
+        if (!nombre.matches("[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+")) {
+            etNombre.setError("El nombre solo puede contener letras");
+            estado = false;
+        }
+
+        String apellido = etApellido.getText().toString().trim();
+
+        if (!apellido.matches("[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+")) {
+            etApellido.setError("El apellido solo puede contener letras");
+            estado = false;
+        }
+
+        String usuario = etUsuario.getText().toString().trim();
+
+        if (usuario.contains(" ")) {
+            etUsuario.setError("El usuario no puede tener espacios");
+            estado = false;
+        }
+
+        String sueldo = etSueldo.getText().toString().trim();
+
+        if (sueldo.isEmpty()) {
+            etSueldo.setError("Ingrese el sueldo");
+            estado = false;
+        } else {
+            try {
+                double valor = Double.parseDouble(sueldo);
+
+                if (valor <= 0) {
+                    etSueldo.setError("Ingrese un sueldo válido");
+                    estado = false;
+                }
+
+            } catch (NumberFormatException e) {
+                etSueldo.setError("Ingrese un número válido");
+                estado = false;
+            }
         }
 
         return estado;

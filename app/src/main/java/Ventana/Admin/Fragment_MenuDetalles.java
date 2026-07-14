@@ -22,24 +22,16 @@ public class Fragment_MenuDetalles extends Fragment {
     private TabLayout tabLayout;
     private ViewPager2 viewPager;
 
-    public Fragment_MenuDetalles() {
+    public Fragment_MenuDetalles() {}
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+        return inflater.inflate(R.layout.fragment_menudetalles, container, false);
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater,
-                             ViewGroup container,
-                             Bundle savedInstanceState) {
-
-        return inflater.inflate(
-                R.layout.fragment_menudetalles,
-                container,
-                false
-        );
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view,
-                              @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view,@Nullable Bundle savedInstanceState) {
 
         super.onViewCreated(view, savedInstanceState);
 
@@ -52,14 +44,12 @@ public class Fragment_MenuDetalles extends Fragment {
 
         String[] titulos = {
                 "Usuarios",
-                "Profesores"
+                "Profesores",
+                "Alumnos"
         };
 
-        new TabLayoutMediator(
-                tabLayout,
-                viewPager,
-                (tab, position) ->
-                        tab.setText(titulos[position])
+        new TabLayoutMediator(tabLayout, viewPager,
+                (tab, position) -> tab.setText(titulos[position])
         ).attach();
     }
 }

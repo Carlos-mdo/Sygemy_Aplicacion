@@ -2,7 +2,6 @@ package Adapter;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -66,7 +65,7 @@ public class UsuarioAdapter extends RecyclerView.Adapter<UsuarioAdapter.ViewHold
 
             Context context = v.getContext();
 
-            mostrarDialogoEditar(context, usuario, holder);
+            mostrarDialogoEditarUsuarios(context, usuario, holder);
 
         });
 
@@ -108,7 +107,7 @@ public class UsuarioAdapter extends RecyclerView.Adapter<UsuarioAdapter.ViewHold
 
                     .setPositiveButton("Editar", (dialog, which) -> {
 
-                        mostrarDialogoEditar(context, usuario, holder);
+                        mostrarDialogoEditarUsuarios(context, usuario, holder);
 
                     })
 
@@ -121,7 +120,7 @@ public class UsuarioAdapter extends RecyclerView.Adapter<UsuarioAdapter.ViewHold
     public int getItemCount() {
         return lista.size();
     }
-    private void mostrarDialogoEditar(Context context, Usuarios usuario, ViewHolder holder) {
+    private void mostrarDialogoEditarUsuarios(Context context, Usuarios usuario, ViewHolder holder) {
 
         LinearLayout layout = new LinearLayout(context);
         layout.setOrientation(LinearLayout.VERTICAL);
@@ -194,5 +193,11 @@ public class UsuarioAdapter extends RecyclerView.Adapter<UsuarioAdapter.ViewHold
 
                 .setNegativeButton("Cancelar", null)
                 .show();
+    }
+
+    public void actualizarLista(List<Usuarios> nuevaLista) {
+        lista.clear();
+        lista.addAll(nuevaLista);
+        notifyDataSetChanged();
     }
 }

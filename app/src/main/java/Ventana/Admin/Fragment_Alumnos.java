@@ -23,23 +23,29 @@ import com.aplicacion.gestion_escolar.MainActivity;
 import com.aplicacion.gestion_escolar.MenuAdminActivity;
 import com.aplicacion.gestion_escolar.R;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import Datos.AdminSQLiteOpenHelper;
+import Datos.CursosDao;
+import Servicios.ServicioAdmin;
 
 public class Fragment_Alumnos extends Fragment {
 
     public String[] generos = {"Seleccionar", "Femenino", "Masculino"};
-    public Spinner spinnerGenero;
-    public EditText etDni, etNombre, etApellido, etUsuario, etContrasenia, etCurso;
+    public Spinner spinnerGenero, spinnerCurso;
+    public EditText etDni, etNombre, etApellido, etUsuario, etContrasenia;
     public Button btnGuardado;
     public ImageButton btnRegreso;
     protected AdminSQLiteOpenHelper datos;
+    private ServicioAdmin servicio;
     protected SQLiteDatabase baseDeDatos;
 
     public Fragment_Alumnos() {}
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
         return inflater.inflate(R.layout.fragment__alumnos, container, false);
     }
 
@@ -49,25 +55,30 @@ public class Fragment_Alumnos extends Fragment {
 
         datos = new AdminSQLiteOpenHelper(requireContext(), "BD_Sygemy", null, 1);
         baseDeDatos = datos.getWritableDatabase();
+        servicio = new ServicioAdmin(requireContext());
 
-        etDni        = view.findViewById(R.id.etDniAlum);
-        etNombre     = view.findViewById(R.id.etNombreAlum);
-        etApellido   = view.findViewById(R.id.etApellidoAlum);
-        etUsuario    = view.findViewById(R.id.etUsuarioAlum);
-        etContrasenia= view.findViewById(R.id.etContraseniaAlum);
-        etCurso      = view.findViewById(R.id.etCurso);
-        spinnerGenero= view.findViewById(R.id.spinGenero);
-        btnGuardado  = view.findViewById(R.id.btnAgregarAlum);
-        btnRegreso   = view.findViewById(R.id.btnRegresoAlum);
+        etDni = view.findViewById(R.id.etDniAlum);
+        etNombre = view.findViewById(R.id.etNombreAlum);
+        etApellido = view.findViewById(R.id.etApellidoAlum);
+        etUsuario = view.findViewById(R.id.etUsuarioAlum);
+        etContrasenia = view.findViewById(R.id.etContraseniaAlum);
+        spinnerCurso = view.findViewById(R.id.spinCurso);
+        spinnerGenero = view.findViewById(R.id.spinGenero);
+        btnGuardado = view.findViewById(R.id.btnAgregarAlum);
+        btnRegreso = view.findViewById(R.id.btnRegresoAlum);
 
-        ArrayAdapter<String> adapterGenero = new ArrayAdapter<>(
-                requireContext(),
-                android.R.layout.simple_spinner_item,
-                generos
-        );
+        ArrayAdapter<String> adapterGenero = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, generos);
 
         adapterGenero.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerGenero.setAdapter(adapterGenero);
+
+        List<String> opcionesCurso = new ArrayList<>();
+        opcionesCurso.add("Seleccionar");
+        opcionesCurso.addAll(new CursosDao(requireContext()).obtenerNombresCursos());
+
+        ArrayAdapter<String> adapterCurso = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, opcionesCurso);
+        adapterCurso.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerCurso.setAdapter(adapterCurso);
 
         btnGuardado.setOnClickListener(v -> {
             if (validacionAlumnos()) {
@@ -95,20 +106,11 @@ public class Fragment_Alumnos extends Fragment {
         valorAlumno.put("dni_alum",    etDni.getText().toString().trim());
         valorAlumno.put("nombre_alum", etNombre.getText().toString().trim());
         valorAlumno.put("apellido_alum",etApellido.getText().toString().trim());
-        valorAlumno.put("curso_alum",  etCurso.getText().toString().trim());
+        valorAlumno.put("curso_alum",  spinnerCurso.getSelectedItem().toString());
         valorAlumno.put("genero_alum", spinnerGenero.getSelectedItem().toString());
         valorAlumno.put("usuario_id",  idUsuario);
 
         long idAlumno = baseDeDatos.insert("alumnos", null, valorAlumno);
-
-//        if (idAlumno == -1) {
-//            Toast.makeText(getContext(),
-//                    "El DNI ya está registrado", Toast.LENGTH_SHORT).show();
-//            etDni.setError("DNI ya registrado");
-//            baseDeDatos.delete("usuarios", "id = ?",
-//                    new String[]{ String.valueOf(idUsuario) });
-//            return;
-//        }
 
         Toast.makeText(getContext(), "Alumno guardado correctamente ✓", Toast.LENGTH_SHORT).show();
 
@@ -117,47 +119,91 @@ public class Fragment_Alumnos extends Fragment {
         etApellido.setText("");
         etUsuario.setText("");
         etContrasenia.setText("");
-        etCurso.setText("");
+        spinnerCurso.setSelection(0);
         spinnerGenero.setSelection(0);
     }
 
     public boolean validacionAlumnos() {
+
+        boolean valido = true;
 
         etDni.setError(null);
         etNombre.setError(null);
         etApellido.setError(null);
         etUsuario.setError(null);
         etContrasenia.setError(null);
-        etCurso.setError(null);
 
-        boolean valido = true;
 
         if (etDni.getText().toString().trim().isEmpty()) {
             etDni.setError("Ingrese el DNI");
             valido = false;
         }
+
         if (etNombre.getText().toString().trim().isEmpty()) {
             etNombre.setError("Ingrese el nombre");
             valido = false;
         }
+
         if (etApellido.getText().toString().trim().isEmpty()) {
             etApellido.setError("Ingrese el apellido");
             valido = false;
         }
-        if (etCurso.getText().toString().trim().isEmpty()) {
-            etCurso.setError("Ingrese el curso");
-            valido = false;
-        }
+
         if (etUsuario.getText().toString().trim().isEmpty()) {
             etUsuario.setError("Ingrese el usuario");
             valido = false;
         }
+
         if (etContrasenia.getText().toString().trim().isEmpty()) {
             etContrasenia.setError("Ingrese la contraseña");
             valido = false;
         }
+
         if (spinnerGenero.getSelectedItemPosition() == 0) {
             Toast.makeText(getContext(), "Seleccione un género", Toast.LENGTH_SHORT).show();
+            valido = false;
+        }
+
+        if (spinnerCurso.getSelectedItemPosition() == 0) {
+            Toast.makeText(getContext(), "Seleccione un curso", Toast.LENGTH_SHORT).show();
+            valido = false;
+        }
+
+        if (servicio.existeDni(etDni.getText().toString().trim())) {
+            etDni.setError("Ese DNI ya está registrado");
+            valido = false;
+        }
+
+        if (servicio.existeUsuario(etUsuario.getText().toString().trim())) {
+            etUsuario.setError("Ese usuario ya existe");
+            valido = false;
+        }
+
+        String dni = etDni.getText().toString().trim();
+
+        if (!dni.matches("\\d{8}")) {
+            etDni.setError("El DNI debe tener 8 números");
+            valido = false;
+        }
+
+        String nombre = etNombre.getText().toString().trim();
+
+        if (!nombre.matches("[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+")) {
+            etNombre.setError("El nombre solo puede contener letras");
+            valido = false;
+        }
+
+        String apellido = etApellido.getText().toString().trim();
+
+        if (!apellido.matches("[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+")) {
+            etApellido.setError("El apellido solo puede contener letras");
+            valido = false;
+        }
+
+        String usuario = etUsuario.getText().toString().trim();
+
+        if (usuario.contains(" ")) {
+            etUsuario.setError("El usuario no puede contener espacios");
             valido = false;
         }
 
