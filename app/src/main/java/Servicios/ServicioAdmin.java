@@ -65,64 +65,106 @@ public class ServicioAdmin {
 
         List<Profesor> listaProfesores = new ArrayList<>();
 
-        Cursor fila_profe = base_Datos.rawQuery("SELECT * FROM profesores", null);
+        Cursor cursor = base_Datos.rawQuery("SELECT * FROM profesores", null);
 
-        if (fila_profe.moveToFirst()) {
+        if (cursor.moveToFirst()) {
             do {
-                int id = fila_profe.getInt(fila_profe.getColumnIndexOrThrow("id"));
 
-                String dni = fila_profe.getString(fila_profe.getColumnIndexOrThrow("dni_prof"));
+                int id = cursor.getInt(
+                        cursor.getColumnIndexOrThrow("id"));
 
-                String nombre = fila_profe.getString(fila_profe.getColumnIndexOrThrow("nombre_prof"));
+                String dni = cursor.getString(
+                        cursor.getColumnIndexOrThrow("dni_prof"));
 
-                String apellido = fila_profe.getString(fila_profe.getColumnIndexOrThrow("apellido_prof"));
+                String nombre = cursor.getString(
+                        cursor.getColumnIndexOrThrow("nombre_prof"));
 
-                String genero = fila_profe.getString(fila_profe.getColumnIndexOrThrow("genero_prof"));
+                String apellido = cursor.getString(
+                        cursor.getColumnIndexOrThrow("apellido_prof"));
 
-                String materia = fila_profe.getString(fila_profe.getColumnIndexOrThrow("materia"));
+                String genero = cursor.getString(
+                        cursor.getColumnIndexOrThrow("genero_prof"));
 
-                int usuarioId = fila_profe.getInt(fila_profe.getColumnIndexOrThrow("usuario_id"));
+                String materia = cursor.getString(
+                        cursor.getColumnIndexOrThrow("materia_prof"));
 
-                double sueldo = fila_profe.getDouble(fila_profe.getColumnIndexOrThrow("sueldo_prof"));
+                int usuarioId = cursor.getInt(
+                        cursor.getColumnIndexOrThrow("usuario_id"));
 
-                Profesor profesor = new Profesor(id, dni, nombre, apellido, genero, materia, usuarioId, sueldo);
+                double sueldo = cursor.getDouble(
+                        cursor.getColumnIndexOrThrow("sueldo_prof"));
+                Profesor profesor = new Profesor(
+                        id,
+                        dni,
+                        nombre,
+                        apellido,
+                        genero,
+                        materia,
+                        usuarioId,
+                        sueldo
+                );
 
                 listaProfesores.add(profesor);
 
-            } while (fila_profe.moveToNext());
+            } while (cursor.moveToNext());
         }
-        fila_profe.close();
+
+        cursor.close();
 
         return listaProfesores;
     }
+
     public List<Alumno> BuscarTodosAlumnos() {
 
         List<Alumno> listaAlumnos = new ArrayList<>();
 
-        Cursor fila_alum = base_Datos.rawQuery("SELECT * FROM alumnos", null);
+        Cursor cursor = base_Datos.rawQuery("SELECT * FROM alumnos", null);
 
-        if (fila_alum.moveToFirst()) {
+        if (cursor.moveToFirst()) {
             do {
-                int id = fila_alum.getInt(fila_alum.getColumnIndexOrThrow("id"));
 
-                String dni = fila_alum.getString(fila_alum.getColumnIndexOrThrow("dni_alum"));
+                int id = cursor.getInt(
+                        cursor.getColumnIndexOrThrow("id"));
 
-                String nombre = fila_alum.getString(fila_alum.getColumnIndexOrThrow("nombre_alum"));
+                String dni = cursor.getString(
+                        cursor.getColumnIndexOrThrow("dni_alum"));
 
-                String apellido = fila_alum.getString(fila_alum.getColumnIndexOrThrow("apellido_alum"));
+                String nombre = cursor.getString(
+                        cursor.getColumnIndexOrThrow("nombre_alum"));
 
-                String genero = fila_alum.getString(fila_alum.getColumnIndexOrThrow("genero_alum"));
+                String apellido = cursor.getString(
+                        cursor.getColumnIndexOrThrow("apellido_alum"));
 
-                String materia = fila_alum.getString(fila_alum.getColumnIndexOrThrow("curso_alum"));
+                String genero = cursor.getString(
+                        cursor.getColumnIndexOrThrow("genero_alum"));
 
-                int usuarioId = fila_alum.getInt(fila_alum.getColumnIndexOrThrow("usuario_id"));
+                String materia = cursor.getString(
+                        cursor.getColumnIndexOrThrow("curso_alum"));
 
-                Alumno alumno = new Alumno(id, dni, nombre, apellido, genero, materia, usuarioId);
+                int usuarioId = cursor.getInt(
+                        cursor.getColumnIndexOrThrow("usuario_id"));
+
+                int cuotasPagadas = cursor.getInt(
+                        cursor.getColumnIndexOrThrow("cuotas_pagadas")
+                );
+
+                Alumno alumno = new Alumno(
+                        id,
+                        dni,
+                        nombre,
+                        apellido,
+                        genero,
+                        materia,
+                        usuarioId,
+                        cuotasPagadas
+                );
+
                 listaAlumnos.add(alumno);
 
-            } while (fila_alum.moveToNext());
+            } while (cursor.moveToNext());
         }
-        fila_alum.close();
+
+        cursor.close();
 
         return listaAlumnos;
     }

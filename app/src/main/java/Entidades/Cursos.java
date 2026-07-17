@@ -1,9 +1,12 @@
 package Entidades;
 
+import Datos.MateriaGradoDao;
+
 public class Cursos {
 
     private String nombreCurso, materia, dias, horaInicio, horaFin;
     private int cantidadAlumnos;
+    private MateriaGradoDao materiaGradoDao;
 
     public Cursos(String nombreCurso, String materia, String dias, String horaInicio, String horaFin, int cantidadAlumnos) {
         this.nombreCurso = nombreCurso;

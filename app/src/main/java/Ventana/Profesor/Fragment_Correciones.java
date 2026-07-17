@@ -49,6 +49,7 @@ public class Fragment_Correciones extends FragmentBase {
     private String materia_Profe;
     private boolean mostrarCorregidas = false;
     private Button btnPendientes , btnCorregidas;
+    private int profesorIdActual = -1;
 
     public Fragment_Correciones() {}
 
@@ -67,9 +68,11 @@ public class Fragment_Correciones extends FragmentBase {
         btnCorregidas   = view.findViewById(R.id.btnCorregidas);
         rvCorrecciones.setLayoutManager(new LinearLayoutManager(requireContext()));
 
+
         AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(requireContext(), "BD_Sygemy", null, 1);
         bd_correccion = admin.getWritableDatabase();
         materia_Profe = UsuarioDao.obtenerMateria(requireContext());
+        profesorIdActual = UsuarioDao.obtenerProfeId(requireContext());
 
         btnPendientes.setOnClickListener(v -> {
             mostrarCorregidas = false;
@@ -99,7 +102,7 @@ public class Fragment_Correciones extends FragmentBase {
     }
     private void cargarLista() {
         EntregaDao daoEnt = new EntregaDao(requireContext());
-        listaPendientes = mostrarCorregidas ? daoEnt.obtenerCorregidas(materia_Profe) : daoEnt.obtenerPendientes(materia_Profe);
+        listaPendientes = mostrarCorregidas ? daoEnt.obtenerCorregidas(profesorIdActual) : daoEnt.obtenerPendientes(profesorIdActual);
 
         if (listaPendientes.isEmpty()) {
             txtSinPendientes.setText(mostrarCorregidas ? "Todavía no hay entregas corregidas" : "No hay entregas pendientes de corregir");
@@ -116,7 +119,7 @@ public class Fragment_Correciones extends FragmentBase {
         if (entrega.corregida) {
             mostrarDetalle_Corregida(entrega);
         } else {
-            abrirCorreccion(entrega);
+            mostrarDetallePendiente(entrega);
         }
     }
     private void mostrarDetalle_Corregida(EntregaPendiente entrega) {
@@ -126,6 +129,20 @@ public class Fragment_Correciones extends FragmentBase {
         TextView txtActividad_corregida = new TextView(requireContext());
         TextView txtNota_corregida = new TextView(requireContext());
         TextView txtComentario_corregida = new TextView(requireContext());
+        TextView txtAdjunto_corregida = new TextView(requireContext());
+        boolean tieneUrlCorregida = entrega.url_Ent != null && !entrega.url_Ent.isEmpty();
+        boolean tieneArchivoCorregida = entrega.arch_Url != null && !entrega.arch_Url.isEmpty();
+
+        if (tieneUrlCorregida) {
+            txtAdjunto_corregida.setText("Enlace: " + entrega.url_Ent);
+            txtAdjunto_corregida.setOnClickListener(v ->
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(entrega.url_Ent))));
+        } else if (tieneArchivoCorregida) {
+            txtAdjunto_corregida.setText("Archivo: " + entrega.arch_Nombre);
+            txtAdjunto_corregida.setOnClickListener(v -> abrirArchivoEntrega(entrega));
+        } else {
+            txtAdjunto_corregida.setText("Sin adjunto");
+        }
 
         layout.setOrientation(LinearLayout.VERTICAL);
         layout.setPadding(40, 20, 40, 10);
@@ -138,12 +155,13 @@ public class Fragment_Correciones extends FragmentBase {
         layout.addView(txtActividad_corregida);
         layout.addView(txtNota_corregida);
         layout.addView(txtComentario_corregida);
+        layout.addView(txtAdjunto_corregida);
 
         new AlertDialog.Builder(requireContext()).setTitle("Entrega corregida").setView(layout).setPositiveButton("Cerrar", null).show();
     }
     private void cargarPendientes() {
         EntregaDao daoEnt = new EntregaDao(requireContext());
-        listaPendientes = daoEnt.obtenerPendientes(materia_Profe);
+        listaPendientes = daoEnt.obtenerPendientes(profesorIdActual);
 
         if (listaPendientes.isEmpty()) {
             txtSinPendientes.setVisibility(View.VISIBLE);
@@ -152,124 +170,89 @@ public class Fragment_Correciones extends FragmentBase {
             txtSinPendientes.setVisibility(View.GONE);
             rvCorrecciones.setVisibility(View.VISIBLE);
         }
-        EntAdapter adapter = new EntAdapter(listaPendientes, requireContext(), this::abrirCorreccion);
+        EntAdapter adapter = new EntAdapter(listaPendientes, requireContext(), this::onEntregaClick);
         rvCorrecciones.setAdapter(adapter);
     }
 
-    private void abrirCorreccion(EntregaPendiente entrega) {
+    private void abrirArchivoEntrega(EntregaPendiente entrega) {
+        try {
+            Uri uri = Uri.parse(entrega.arch_Url);
+            String mime = obtenerMimeType(entrega.arch_Nombre);
+
+            if (mime.equals("*/*")) {
+                String tipoResolver = requireContext().getContentResolver().getType(uri);
+                if (tipoResolver != null) mime = tipoResolver;
+            }
+
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setDataAndType(uri, mime);
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            startActivity(intent);
+        } catch (android.content.ActivityNotFoundException e) {
+            Toast.makeText(requireContext(), "No hay una app instalada para abrir este tipo de archivo", Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(requireContext(), "No se puede abrir el archivo", Toast.LENGTH_SHORT).show();
+        }
+    }
+    private String obtenerMimeType(String nombreArchivo) {
+        String mime = "*/*";
+        if (nombreArchivo != null) {
+            int punto = nombreArchivo.lastIndexOf('.');
+            if (punto >= 0 && punto < nombreArchivo.length() - 1) {
+                String extension = nombreArchivo.substring(punto + 1).toLowerCase();
+                String tipo = android.webkit.MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+                if (tipo != null) mime = tipo;
+            }
+        }
+        return mime;
+    }
+    private void mostrarDetallePendiente(EntregaPendiente entrega) {
         LinearLayout layout = new LinearLayout(requireContext());
         layout.setOrientation(LinearLayout.VERTICAL);
         layout.setPadding(40, 20, 40, 10);
 
-        TextView txtAlumno_correcion = new TextView(requireContext());
-        TextView txtActividad_correcion = new TextView(requireContext());
-        TextView txtComentario_correcion = new TextView(requireContext());
-        TextView txtAdjunto_correcion = new TextView(requireContext());
-        Spinner spinnerTrimestre = new Spinner(requireContext());
-        EditText etNota = new EditText(requireContext());
+        TextView txtAlumno = new TextView(requireContext());
+        txtAlumno.setText("Alumno: " + entrega.nombre_Alum);
 
-        txtAlumno_correcion.setText("Alumno: " + entrega.nombre_Alum);
-        txtActividad_correcion.setText("Actividad: " + entrega.titulo_Actividad);
+        TextView txtActividad = new TextView(requireContext());
+        txtActividad.setText("Actividad: " + entrega.titulo_Actividad);
 
+        TextView txtFecha = new TextView(requireContext());
+        txtFecha.setText("Fecha de entrega: " + entrega.fecha_Ent);
+
+        TextView txtComentario = new TextView(requireContext());
         String coment = entrega.comentario;
-        if (coment == null || coment.isEmpty()) {
-            coment = "Sin comentario";
-        }
-        txtComentario_correcion.setText("Comentario: " + coment);
+        if (coment == null || coment.isEmpty()) coment = "Sin comentario";
+        txtComentario.setText("Comentario: " + coment);
 
-        boolean tieneUrl = entrega.url_Ent != null && !entrega.url_Ent.equals("");
-        boolean tieneArchivo = entrega.arch_Url != null && entrega.arch_Url.length() > 0;
+        TextView txtAdjunto = new TextView(requireContext());
+        boolean tieneUrl = entrega.url_Ent != null && !entrega.url_Ent.isEmpty();
+        boolean tieneArchivo = entrega.arch_Url != null && !entrega.arch_Url.isEmpty();
 
-        if (tieneUrl == true) {
-            txtAdjunto_correcion.setText("Enlace: " + entrega.url_Ent);
-            txtAdjunto_correcion.setOnClickListener(v -> {
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(entrega.url_Ent));
-                startActivity(intent);
-            });
+        if (tieneUrl) {
+            txtAdjunto.setText("Enlace: " + entrega.url_Ent);
+            txtAdjunto.setOnClickListener(v ->
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(entrega.url_Ent))));
         } else if (tieneArchivo) {
-            txtAdjunto_correcion.setText("Archivo: " + entrega.arch_Nombre);
-            txtAdjunto_correcion.setOnClickListener(v -> {
-                try {
-                    Uri url = Uri.parse(entrega.arch_Url);
-                    String tipoArchivo = requireContext().getContentResolver().getType(url);
-                    Intent intent = new Intent(Intent.ACTION_VIEW);
-                    if (tipoArchivo != null) {
-                        intent.setDataAndType(url, tipoArchivo);
-                    } else {
-                        intent.setDataAndType(url, "*/*");
-                    }
-                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    startActivity(intent);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Toast.makeText(requireContext(), "No se puede abrir el archivo", Toast.LENGTH_SHORT).show();
-                }
-            });
+            txtAdjunto.setText("Archivo: " + entrega.arch_Nombre);
+            txtAdjunto.setOnClickListener(v -> abrirArchivoEntrega(entrega));
         } else {
-            txtAdjunto_correcion.setText("Sin adjunto");
+            txtAdjunto.setText("Sin adjunto");
         }
 
-        ArrayAdapter<String> trimesAdapter = new ArrayAdapter<String>(requireContext(), android.R.layout.simple_spinner_item, nombresTrimestres);
-        trimesAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerTrimestre.setAdapter(trimesAdapter);
+        layout.addView(txtAlumno);
+        layout.addView(txtActividad);
+        layout.addView(txtFecha);
+        layout.addView(txtComentario);
+        layout.addView(txtAdjunto);
 
-        etNota.setHint("Nota (ej: 8.5)");
-        etNota.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
-
-        layout.addView(txtAlumno_correcion);
-        layout.addView(txtActividad_correcion);
-        layout.addView(txtComentario_correcion);
-        layout.addView(txtAdjunto_correcion);
-        layout.addView(spinnerTrimestre);
-        layout.addView(etNota);
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-            builder.setTitle("Corregir entrega");
-            builder.setView(layout);
-            builder.setPositiveButton("Guardar nota", (dialogo, which) -> {
-
-            String valorNota = etNota.getText().toString().trim();
-            if (valorNota.isEmpty()) {
-                Toast.makeText(requireContext(), "Ingrese una nota", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            double nota = 0;
-            try {
-                nota = Double.parseDouble(valorNota);
-            } catch (NumberFormatException e) {
-                Toast.makeText(requireContext(), "Nota inválida", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            int posTrimestre = spinnerTrimestre.getSelectedItemPosition();
-            if (posTrimestre < 0 || posTrimestre >= listaTrimestres.size()) {
-                Toast.makeText(requireContext(), "Seleccione un trimestre", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            int trimestreId = listaTrimestres.get(posTrimestre);
-            String fecha = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(new Date());
-
-            ContentValues valores = new ContentValues();
-            valores.put("alumno_id", entrega.alumno_id);
-            valores.put("trimestre_id", trimestreId);
-            valores.put("descripcion", entrega.titulo_Actividad);
-            valores.put("nota", nota);
-            valores.put("fecha", fecha);
-            valores.put("materia_cal", materia_Profe);
-            valores.put("entrega_id", entrega.entrega_id);
-
-            long resultado = bd_correccion.insert("calificaciones", null, valores);
-            if (resultado != -1) {
-                Toast.makeText(requireContext(), "Entrega corregida", Toast.LENGTH_SHORT).show();
-                cargarPendientes();
-            } else {
-                Toast.makeText(requireContext(), "Error al guardar la nota", Toast.LENGTH_SHORT).show();
-            }
-        });
-        builder.setNegativeButton("Cancelar", null);
-        builder.show();
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Entrega pendiente")
+                .setView(layout)
+                .setPositiveButton("Cerrar", null)
+                .show();
     }
-
     @Override
     public void onDestroy() {
         super.onDestroy();

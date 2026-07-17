@@ -1,53 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:gravity="center_vertical"
-    android:paddingVertical="10dp">
-
-    <View
-        android:id="@+id/viewIndicadorTipo"
-        android:layout_width="4dp"
-        android:layout_height="36dp"
-        android:background="#3F51B5" />
+    android:layout_marginHorizontal="4dp"
+    android:layout_marginVertical="5dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp"
+    app:cardBackgroundColor="#FFFFFF">
 
     <LinearLayout
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:layout_marginStart="10dp"
-        android:orientation="vertical">
+        android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/tvEventoTitulo"
-            android:layout_width="match_parent"
+        <!-- Franja de color: la pinta el adapter segÃºn sea examen u otro tipo -->
+        <View
+            android:id="@+id/viewIndicadorTipo"
+            android:layout_width="6dp"
+            android:layout_height="match_parent"
+            android:background="#F9A825" />
+
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:textColor="#1A1A1A"
-            android:maxLines="1"
-            android:ellipsize="end"
-            tools:text="Parcial de Matematica" />
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:padding="14dp">
 
-        <TextView
-            android:id="@+id/tvEventoMateria"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="12sp"
-            android:textColor="#666666"
-            tools:text="Matematica" />
+            <TextView
+                android:id="@+id/tvEventoTitulo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:textColor="#2B2B2B"
+                android:textSize="15sp" />
 
+            <TextView
+                android:id="@+id/tvEventoMateria"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="13sp"
+                android:textColor="#777777"
+                android:layout_marginTop="3dp" />
+
+            <TextView
+                android:id="@+id/tvEventoFecha"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:layout_marginTop="6dp" />
+
+        </LinearLayout>
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/tvEventoFecha"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="12sp"
-        android:textStyle="bold"
-        android:textColor="#3F51B5"
-        tools:text="18/07" />
-
-</LinearLayout>
+</androidx.cardview.widget.CardView>

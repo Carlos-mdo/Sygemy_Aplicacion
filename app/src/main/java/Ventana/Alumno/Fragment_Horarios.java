@@ -54,6 +54,10 @@ public class Fragment_Horarios extends Fragment {
             return;
         }
 
+        List<Horarios> listas = horarioDAO.obtenerHorariosPorAlumno(usuarioId);
+
+        android.util.Log.d("Fragment_Horarios", "usuarioId=" + usuarioId + " filas=" + listas.size());
+
         String curso = horarioDAO.obtenerCursoDeAlumno(usuarioId);
         if (curso == null) {
             Toast.makeText(getContext(), "No se encontró el curso del alumno", Toast.LENGTH_SHORT).show();

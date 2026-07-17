@@ -37,6 +37,7 @@ import java.util.List;
 import Adapter.ActAdapter;
 import Datos.ActividadDao;
 import Datos.AdminSQLiteOpenHelper;
+import Datos.UsuarioDao;
 import Entidades.Actividad;
 
 public class Fragment_Actividad extends FragmentBase {
@@ -53,6 +54,7 @@ public class Fragment_Actividad extends FragmentBase {
     private RecyclerView rvActividades;
     private ProgressBar progressActividades;
     private ActAdapter adapter;
+    private TextView tvTotalActividades, tvMateriaDashboard;
     private final List<Actividad> listaActividades = new ArrayList<>();
 
     @Override
@@ -87,6 +89,10 @@ public class Fragment_Actividad extends FragmentBase {
         progressActividades = view.findViewById(R.id.progressActividades);
         rvActividades.setLayoutManager(new LinearLayoutManager(requireContext()));
 
+        tvTotalActividades = view.findViewById(R.id.tvTotalActividades);
+        tvMateriaDashboard = view.findViewById(R.id.tvMateriaDashboard);
+        tvMateriaDashboard.setText(materia_profe);
+
         adapter = new ActAdapter(listaActividades, requireContext(), -1, null);
         rvActividades.setAdapter(adapter);
         cargarActividades();
@@ -103,6 +109,7 @@ public class Fragment_Actividad extends FragmentBase {
             listaActividades.clear();
             listaActividades.addAll(resultado);
             adapter.notifyDataSetChanged();
+            tvTotalActividades.setText(String.valueOf(listaActividades.size()));
             progressActividades.setVisibility(View.GONE);
         });
     }
@@ -129,6 +136,30 @@ public class Fragment_Actividad extends FragmentBase {
         });
 
         popOpciones.show();
+    }
+    private String copiarArchivoInterno(Uri origen, String nombreOriginal) {
+        try {
+            java.io.File carpetaAdjuntos = new java.io.File(requireContext().getFilesDir(), "adjuntos");
+            if (!carpetaAdjuntos.exists()) carpetaAdjuntos.mkdirs();
+
+            String nombreSeguro = System.currentTimeMillis() + "_" +
+                    nombreOriginal.replaceAll("[^a-zA-Z0-9._-]", "_");
+            java.io.File archivoDestino = new java.io.File(carpetaAdjuntos, nombreSeguro);
+
+            try (java.io.InputStream in = requireContext().getContentResolver().openInputStream(origen);
+                 java.io.OutputStream out = new java.io.FileOutputStream(archivoDestino)) {
+                if (in == null) return null;
+                byte[] buffer = new byte[4096];
+                int leido;
+                while ((leido = in.read(buffer)) != -1) {
+                    out.write(buffer, 0, leido);
+                }
+            }
+            return archivoDestino.getAbsolutePath();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     private void mostrarMensaje(String tipo) {
@@ -230,24 +261,22 @@ public class Fragment_Actividad extends FragmentBase {
         fila.close();
         bd_trimesAct.close();
     }
-    private void guardarActividad( String tipo, String titulo, String descripcion, String fecha, String url, Uri archivoUrl, String archivoNombre, int trimestreId, String adjunInfo) {
+    private void guardarActividad(String tipo, String titulo, String descripcion, String fecha, String url, Uri archivoUrl, String archivoNombre, int trimestreId, String adjunInfo) {
 
-        android.util.Log.d("Actividad", "Tipo: " + tipo);
-        android.util.Log.d("Actividad", "Título: " + titulo);
-        android.util.Log.d("Actividad", "Descripción: " + descripcion);
-        android.util.Log.d("Actividad", "Fecha: " + fecha);
-        android.util.Log.d("Actividad", "Url: " + (url.isEmpty() ? "ninguno" : url));
-        android.util.Log.d("Actividad", "Archivo URL: " + (archivoUrl != null ? archivoUrl.toString() : "ninguno"));
-
+        String archivoUrlGuardado = "";
         if (archivoUrl != null) {
-            try {
-                requireContext().getContentResolver().takePersistableUriPermission(archivoUrl, android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            } catch (SecurityException e) {
-                e.printStackTrace();
+            String rutaLocal = copiarArchivoInterno(archivoUrl, archivoNombre != null ? archivoNombre : "archivo");
+            if (rutaLocal != null) {
+                archivoUrlGuardado = rutaLocal;
+            } else {
+                Toast.makeText(requireContext(), "No se pudo copiar el archivo adjunto", Toast.LENGTH_SHORT).show();
             }
         }
 
-        Actividad act = new Actividad( tipo, titulo, descripcion, fecha, url, archivoNombre != null ? archivoNombre : "", archivoUrl != null ? archivoUrl.toString() : "", materia_profe, trimestreId);
+        int profesorId = UsuarioDao.obtenerProfeId(requireContext());
+
+        Actividad act = new Actividad(tipo, titulo, descripcion, fecha, url,
+                archivoNombre != null ? archivoNombre : "", archivoUrlGuardado, materia_profe, trimestreId, profesorId);
         ActividadDao daoAct = new ActividadDao(requireContext());
         boolean cargado = daoAct.insertar(act);
 

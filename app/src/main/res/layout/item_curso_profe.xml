@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_marginHorizontal="16dp"
     android:layout_marginVertical="6dp"
     app:cardCornerRadius="14dp"
@@ -12,46 +12,93 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="14dp">
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/headerContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="14dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvNombreCurso"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="17sp"
+                    android:textStyle="bold"
+                    android:textColor="#1A1A1A"
+                    tools:text="4to Año B" />
+
+                <TextView
+                    android:id="@+id/tvMateriaCurso"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:textSize="14sp"
+                    android:textColor="#3F51B5"
+                    tools:text="Matemática" />
+
+                <TextView
+                    android:id="@+id/tvHorarioCurso"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:textSize="13sp"
+                    android:textColor="#666666"
+                    tools:text="Lunes, Miércoles - 08:00 a 09:30" />
+
+                <TextView
+                    android:id="@+id/tvCantidadAlumnosCurso"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:textColor="#333333"
+                    tools:text="28 alumnos" />
+
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/ivFlecha"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center_vertical"
+                android:src="@android:drawable/arrow_down_float"
+                android:contentDescription="Expandir" />
+
+        </LinearLayout>
 
         <TextView
-            android:id="@+id/tvNombreCurso"
-            android:layout_width="wrap_content"
+            android:id="@+id/tvSinAlumnos"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="17sp"
-            android:textStyle="bold"
-            android:textColor="#1A1A1A"
-            tools:text="4to Año B"
-            xmlns:tools="http://schemas.android.com/tools" />
-
-        <TextView
-            android:id="@+id/tvMateriaCurso"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:textSize="14sp"
-            android:textColor="#3F51B5"
-            tools:text="Matemática" />
-
-        <TextView
-            android:id="@+id/tvHorarioCurso"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
+            android:text="No hay alumnos en este curso"
+            android:textColor="#999999"
             android:textSize="13sp"
-            android:textColor="#666666"
-            tools:text="Lunes, Miércoles - 08:00 a 09:30" />
+            android:paddingHorizontal="14dp"
+            android:paddingBottom="12dp"
+            android:visibility="gone" />
 
-        <TextView
-            android:id="@+id/tvCantidadAlumnosCurso"
-            android:layout_width="wrap_content"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvAlumnos"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:textSize="13sp"
-            android:textStyle="bold"
-            android:textColor="#333333"
-            tools:text="28 alumnos" />
+            android:nestedScrollingEnabled="false"
+            android:paddingBottom="8dp"
+            android:visibility="gone"
+            tools:listitem="@layout/item_alumno_simple"
+            tools:itemCount="2" />
 
     </LinearLayout>
 

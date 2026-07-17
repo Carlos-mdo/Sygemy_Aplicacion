@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.core.content.FileProvider;
 
 import com.aplicacion.gestion_escolar.R;
 
@@ -45,7 +46,8 @@ public class ActAdapter extends RecyclerView.Adapter<ActAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull ViewHolder vHolder, int posicion) {
         Actividad act = lista.get(posicion);
-        vHolder.tvTitulo.setText(act.getTipo() + " - " + act.getTitulo());
+        vHolder.tvTipo.setText(act.getTipo());
+        vHolder.tvTitulo.setText(act.getTitulo());
         vHolder.tvDescripcion.setText(act.getDescripcion());
         vHolder.tvFecha.setText(act.getFecha());
 
@@ -60,19 +62,28 @@ public class ActAdapter extends RecyclerView.Adapter<ActAdapter.ViewHolder> {
             vHolder.tvAdjunto.setText(act.getArchivoNombre());
             vHolder.tvAdjunto.setVisibility(View.VISIBLE);
             vHolder.tvAdjunto.setOnClickListener(v -> {
+                android.content.Context ctx = vHolder.itemView.getContext();
+                java.io.File archivo = new java.io.File(act.getArchivoUrl());
+
+                if (!archivo.exists()) {
+                    Toast.makeText(ctx, "El archivo ya no está disponible", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 try {
-                    android.content.Context ctx = vHolder.itemView.getContext(); // CAMBIO: usar el context de la vista, no el campo de instancia
-                    Uri uri = Uri.parse(act.getArchivoUrl());
-                    String mime = ctx.getContentResolver().getType(uri);
+                    Uri uriArchivo = FileProvider.getUriForFile(ctx, ctx.getPackageName() + ".fileprovider", archivo);
                     Intent intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setDataAndType(uri, mime != null ? mime : "*/*");
+                    intent.setDataAndType(uriArchivo, obtenerMimeType(act.getArchivoNombre()));
                     intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                     ctx.startActivity(intent);
+                } catch (android.content.ActivityNotFoundException e) {
+                    Toast.makeText(ctx, "No hay una app instalada para abrir este tipo de archivo", Toast.LENGTH_SHORT).show();
                 } catch (Exception e) {
-                    Toast.makeText(vHolder.itemView.getContext(), "No se puede abrir el archivo", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ctx, "No se puede abrir el archivo", Toast.LENGTH_SHORT).show();
                 }
             });
-        } else { vHolder.tvAdjunto.setVisibility(View.GONE); }
+        } else {
+            vHolder.tvAdjunto.setVisibility(View.GONE);
+        }
 
         if (context != null && fragment != null) {
             EntregaDao entregaDao = new EntregaDao(context);
@@ -92,6 +103,18 @@ public class ActAdapter extends RecyclerView.Adapter<ActAdapter.ViewHolder> {
         } else {
             vHolder.btnEntregar.setVisibility(View.GONE);
         }
+    }
+    private String obtenerMimeType(String nombreArchivo) {
+        String mime = "*/*";
+        if (nombreArchivo != null) {
+            int punto = nombreArchivo.lastIndexOf('.');
+            if (punto >= 0 && punto < nombreArchivo.length() - 1) {
+                String extension = nombreArchivo.substring(punto + 1).toLowerCase();
+                String tipo = android.webkit.MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+                if (tipo != null) mime = tipo;
+            }
+        }
+        return mime;
     }
 
     @Override

@@ -284,16 +284,17 @@ public class Fragment_Calificaciones extends Fragment {
             } else if (tieneArchivo) {
                 tvAdjunto.setText("Archivo: " + entrega.arch_Nombre);
                 tvAdjunto.setOnClickListener(v -> {
-                    try {
-                        Uri uri = Uri.parse(entrega.arch_Url);
-                        String mime = requireContext().getContentResolver().getType(uri);
-                        Intent intent = new Intent(Intent.ACTION_VIEW);
-                        intent.setDataAndType(uri, mime != null ? mime : "*/*");
-                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                        startActivity(intent);
-                    } catch (Exception e) {
-                        Toast.makeText(requireContext(), "No se puede abrir el archivo", Toast.LENGTH_SHORT).show();
-                    }
+                    abrirArchivoEntrega(entrega);
+//                    try {
+//                        Uri uri = Uri.parse(entrega.arch_Url);
+//                        String mime = requireContext().getContentResolver().getType(uri);
+//                        Intent intent = new Intent(Intent.ACTION_VIEW);
+//                        intent.setDataAndType(uri, mime != null ? mime : "*/*");
+//                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+//                        startActivity(intent);
+//                    } catch (Exception e) {
+//                        Toast.makeText(requireContext(), "No se puede abrir el archivo", Toast.LENGTH_SHORT).show();
+//                    }
                 });
             } else {
                 tvAdjunto.setText("Sin adjunto");
@@ -451,7 +452,40 @@ public class Fragment_Calificaciones extends Fragment {
             builder.setNegativeButton("Cancelar", null);
             builder.show();
         }
+    private void abrirArchivoEntrega(EntregaPendiente entrega) {
+        try {
+            Uri uri = Uri.parse(entrega.arch_Url);
+            String mime = obtenerMimeType(entrega.arch_Nombre);
 
+            if (mime.equals("*/*")) {
+                String tipoResolver = requireContext().getContentResolver().getType(uri);
+                if (tipoResolver != null) mime = tipoResolver;
+            }
+
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setDataAndType(uri, mime);
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            startActivity(intent);
+        } catch (android.content.ActivityNotFoundException e) {
+            Toast.makeText(requireContext(), "No hay una app instalada para abrir este tipo de archivo", Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(requireContext(), "No se puede abrir el archivo", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private String obtenerMimeType(String nombreArchivo) {
+        String mime = "*/*";
+        if (nombreArchivo != null) {
+            int punto = nombreArchivo.lastIndexOf('.');
+            if (punto >= 0 && punto < nombreArchivo.length() - 1) {
+                String extension = nombreArchivo.substring(punto + 1).toLowerCase();
+                String tipo = android.webkit.MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+                if (tipo != null) mime = tipo;
+            }
+        }
+        return mime;
+    }
         @Override
         public void onDestroy() {
             super.onDestroy();

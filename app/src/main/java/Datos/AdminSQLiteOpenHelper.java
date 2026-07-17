@@ -61,6 +61,7 @@ public class AdminSQLiteOpenHelper extends SQLiteOpenHelper{
                 "genero_alum TEXT," +
                 "foto_alum TEXT," +
                 "usuario_id INTEGER," +
+                "cuotas_pagadas INTEGER DEFAULT 0,"+
                 "FOREIGN KEY(usuario_id) REFERENCES usuarios(id))");
 
         BaseDeDatos.execSQL("CREATE TABLE trimestres (" +
@@ -95,7 +96,9 @@ public class AdminSQLiteOpenHelper extends SQLiteOpenHelper{
                 "archivo_url TEXT," +
                 "materia_act TEXT,"+
                 "trimestre_id INTEGER," +
-                "FOREIGN KEY(trimestre_id) REFERENCES trimestres(id))");
+                "profesor_id INTEGER," +
+                "FOREIGN KEY(trimestre_id) REFERENCES trimestres(id)," +
+                "FOREIGN KEY(profesor_id) REFERENCES profesores(id))");
 
         BaseDeDatos.execSQL("CREATE TABLE entregas (" +
                 "id_ent INTEGER PRIMARY KEY AUTOINCREMENT," +
@@ -119,15 +122,28 @@ public class AdminSQLiteOpenHelper extends SQLiteOpenHelper{
                 "profesor_id INTEGER," +
                 "FOREIGN KEY(profesor_id) REFERENCES profesores(id))");
 
-//        ContentValues profeValores = new ContentValues();
-//        profeValores.put("dni_prof", "00000000");
-//        profeValores.put("nombre_prof", "Carlos");
-//        profeValores.put("apellido_prof", "Ejemplo");
-//        profeValores.put("materia_prof", "Matematica");
-//        long profesorId = BaseDeDatos.insert("profesores", null, profeValores);
-//
-//        Horarios hora = new Horarios("6to_grado","Matematica","Lunes","09:00","11:00", (int) profesorId);
-//        BaseDeDatos.insert("horarios",null,hora.Valores());
+        ContentValues profeValores = new ContentValues();
+        profeValores.put("dni_prof", "21642241");
+        profeValores.put("nombre_prof", "Sebastian");
+        profeValores.put("apellido_prof", "Herrera");
+        profeValores.put("materia_prof", "Biología");
+        profeValores.put("genero_prof","Masculino");
+        profeValores.put("sueldo_prof","213000.1312");
+        long profesorId = BaseDeDatos.insert("profesores", null, profeValores);
+        ContentValues usuarios = new ContentValues();
+        usuarios.put("usuario","sebah");
+        usuarios.put("contrasenia","sebah");
+        usuarios.put("rol","profesor");
+        BaseDeDatos.insert("usuarios",null, usuarios);
+
+        Horarios hora = new Horarios("5to Grado","Matematica","Lunes","09:00","11:00", (int) profesorId);
+        BaseDeDatos.insert("horarios",null,hora.Valores());
+
+        BaseDeDatos.execSQL("CREATE TABLE materias_grado (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "curso TEXT NOT NULL," +
+                "materia TEXT NOT NULL," +
+                "UNIQUE(curso, materia))");
 
         BaseDeDatos.execSQL("INSERT INTO trimestres (nombre) VALUES ('1° Trimestre')");
         BaseDeDatos.execSQL("INSERT INTO trimestres (nombre) VALUES ('2° Trimestre')");

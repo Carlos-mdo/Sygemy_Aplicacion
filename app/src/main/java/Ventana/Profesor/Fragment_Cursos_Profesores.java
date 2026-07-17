@@ -23,7 +23,10 @@ import java.util.List;
 import java.util.Locale;
 
 import Adapter.CursosAdapter;
+import Datos.AlumnosDao;
 import Datos.CursosDao;
+import Entidades.Alumno;
+import Entidades.CursoConMaterias;
 import Entidades.Cursos;
 
 public class Fragment_Cursos_Profesores extends Fragment {
@@ -33,14 +36,10 @@ public class Fragment_Cursos_Profesores extends Fragment {
     private TextInputEditText etSearchCurso;
     private CursosAdapter adapter;
     private CursosDao cursosDAO;
-    private List<Cursos> listaCompleta = new ArrayList<>();
+    private AlumnosDao alumnosDao;
+    private List<CursoConMaterias> listaCompleta = new ArrayList<>();
 
     public Fragment_Cursos_Profesores() {}
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -61,6 +60,7 @@ public class Fragment_Cursos_Profesores extends Fragment {
         rvCursosProfesor.setLayoutManager(new LinearLayoutManager(getContext()));
 
         cursosDAO = new CursosDao(getContext());
+        alumnosDao = new AlumnosDao(getContext());
         tvTituloCursos.setText("Mis cursos");
 
         cargarCursosDelProfesor();
@@ -85,7 +85,7 @@ public class Fragment_Cursos_Profesores extends Fragment {
         String[] datosProfesor = cursosDAO.obtenerDatosProfesor(profesorId);
         tvMateriaProfesor.setText("Materia: " + datosProfesor[1]);
 
-        listaCompleta = cursosDAO.obtenerCursosPorProfesor(profesorId);
+        listaCompleta = cursosDAO.obtenerCursosConMateriasPorProfesor(profesorId);
         tvCantidadCursos.setText(listaCompleta.size() + (listaCompleta.size() == 1 ? " curso asignado" : " cursos asignados"));
 
         if (listaCompleta.isEmpty()) {
@@ -93,10 +93,11 @@ public class Fragment_Cursos_Profesores extends Fragment {
         } else {
             rvCursosProfesor.setVisibility(View.VISIBLE);
             tvSinCursos.setVisibility(View.GONE);
-            adapter = new CursosAdapter(listaCompleta);
+            adapter = new CursosAdapter(listaCompleta, alumnosDao);
             rvCursosProfesor.setAdapter(adapter);
         }
     }
+
     private void configurarBuscador() {
         etSearchCurso.addTextChangedListener(new TextWatcher() {
             @Override
@@ -115,12 +116,14 @@ public class Fragment_Cursos_Profesores extends Fragment {
     private void filtrarCursos(String textoBusqueda) {
         if (listaCompleta.isEmpty()) return;
 
-        List<Cursos> filtrada = new ArrayList<>();
+        List<CursoConMaterias> filtrada = new ArrayList<>();
         String texto = textoBusqueda.toLowerCase(Locale.getDefault()).trim();
 
-        for (Cursos c : listaCompleta) {
-            if (c.getNombreCurso().toLowerCase(Locale.getDefault()).contains(texto)
-                    || c.getMateria().toLowerCase(Locale.getDefault()).contains(texto)) {
+        for (CursoConMaterias c : listaCompleta) {
+            boolean coincideCurso = c.getNombreCurso().toLowerCase(Locale.getDefault()).contains(texto);
+            boolean coincideMateria = c.getMateriasDelProfesor().stream()
+                    .anyMatch(m -> m.toLowerCase(Locale.getDefault()).contains(texto));
+            if (coincideCurso || coincideMateria) {
                 filtrada.add(c);
             }
         }
@@ -147,6 +150,9 @@ public class Fragment_Cursos_Profesores extends Fragment {
         super.onDestroyView();
         if (cursosDAO != null) {
             cursosDAO.cerrar();
+        }
+        if (alumnosDao != null) {
+            alumnosDao.cerrar();
         }
     }
 }

@@ -137,22 +137,22 @@ public class PagosAdapter extends RecyclerView.Adapter<PagosAdapter.ViewHolder> 
 
         switch (curso) {
 
-            case "1":
+            case "1er Grado":
                 return 20000;
 
-            case "2":
+            case "2do Grado":
                 return 30000;
 
-            case "3":
+            case "3er Grado":
                 return 40000;
 
-            case "4":
+            case "4to Grado":
                 return 50000;
 
-            case "5":
+            case "5to Grado":
                 return 60000;
 
-            case "6":
+            case "6to Grado":
                 return 70000;
 
             default:

@@ -124,7 +124,7 @@ public class AlumnoAdapter extends RecyclerView.Adapter<AlumnoAdapter.ViewHolder
 
         Spinner spinnerCurso = new Spinner(context);
 
-        String[] curso = {"1", "2", "3", "4", "5", "6"};
+        String[] curso = {"1er Grado", "2do Grado", "3er Grado", "4to Grado", "5to Grado", "6to Grado"};
 
         ArrayAdapter<String> adapterCurso = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, curso);
 

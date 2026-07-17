@@ -5,8 +5,8 @@ import android.content.ContentValues;
 public class Actividad {
     private int id_act;
     private String tipo_act, titulo_act, descripcion_act, fecha_act, enlace_act, archivoNombre_act, archivoUrl_act, materia_act;
-    private int trimestreId_act;
-    public Actividad(String tipo, String titulo, String descripcion, String fecha, String enlace, String archivoNombre, String archivoUrl, String materia, int trimestreId) {
+    private int trimestreId_act, profesorId_act;
+    public Actividad(String tipo, String titulo, String descripcion, String fecha, String enlace, String archivoNombre, String archivoUrl, String materia, int trimestreId, int profesorId) {
         this.tipo_act = tipo;
         this.titulo_act = titulo;
         this.descripcion_act = descripcion;
@@ -16,9 +16,10 @@ public class Actividad {
         this.archivoUrl_act = archivoUrl;
         this.materia_act = materia;
         this.trimestreId_act = trimestreId;
+        this.profesorId_act = profesorId;
     }
-    public Actividad(int id, String tipo, String titulo, String descripcion, String fecha, String enlace, String archivoNombre, String archivoUri, String materia, int trimestreId) {
-        this(tipo, titulo, descripcion, fecha, enlace, archivoNombre, archivoUri, materia, trimestreId);
+    public Actividad(int id, String tipo, String titulo, String descripcion, String fecha, String enlace, String archivoNombre, String archivoUri, String materia, int trimestreId, int profesorId) {
+        this(tipo, titulo, descripcion, fecha, enlace, archivoNombre, archivoUri, materia, trimestreId, profesorId);
         this.id_act = id;
     }
 
@@ -33,6 +34,7 @@ public class Actividad {
         cvValores.put("archivo_url", archivoUrl_act);
         cvValores.put("materia_act", materia_act);
         cvValores.put("trimestre_id", trimestreId_act);
+        cvValores.put("profesor_id", profesorId_act);
         return cvValores;
     }
 
@@ -46,4 +48,5 @@ public class Actividad {
     public String getArchivoUrl() { return archivoUrl_act; }
     public String getMateria() { return materia_act; }
     public int getTrimestreId() { return trimestreId_act; }
+    public int getProfesorId(){ return profesorId_act;  }
 }

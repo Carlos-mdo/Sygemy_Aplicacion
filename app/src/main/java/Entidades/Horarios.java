@@ -17,8 +17,7 @@ public class Horarios {
         this.profesorId = profesorId;
     }
 
-    public Horarios(int idHorario, String curso, String materia, String dia, String horaInicio, String horaFin,
-                    int profesorId, String profesorNombre) {
+    public Horarios(int idHorario, String curso, String materia, String dia, String horaInicio, String horaFin, int profesorId, String profesorNombre) {
         this.idHorario = idHorario;
         this.curso = curso;
         this.materia = materia;

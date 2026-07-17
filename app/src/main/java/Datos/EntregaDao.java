@@ -34,7 +34,7 @@ public class EntregaDao {
         bd.close();
         return estado;
     }
-    public List<EntregaPendiente> obtenerPendientes(String materia) {
+    public List<EntregaPendiente> obtenerPendientes(int profesorId) {
         List<EntregaPendiente> lista = new ArrayList<>();
         SQLiteDatabase bd_pendientes = baseDeDatos.getReadableDatabase();
 
@@ -44,11 +44,11 @@ public class EntregaDao {
                 "FROM entregas ent " +
                 "INNER JOIN actividad act ON act.id_act = ent.actividad_id " +
                 "INNER JOIN alumnos alum ON alum.id = ent.alumno_id " +
-                "WHERE act.materia_act = ? " +
+                "WHERE act.profesor_id = ? " +                                          // antes: act.materia_act = ?
                 "AND ent.id_ent NOT IN (SELECT entrega_id FROM calificaciones WHERE entrega_id IS NOT NULL) " +
                 "ORDER BY ent.fecha_ent DESC";
 
-        Cursor fila = bd_pendientes.rawQuery(sql, new String[]{materia});
+        Cursor fila = bd_pendientes.rawQuery(sql, new String[]{String.valueOf(profesorId)});
 
         while (fila.moveToNext()) {
             EntregaPendiente ent_pendiente = new EntregaPendiente(
@@ -72,7 +72,7 @@ public class EntregaDao {
         return lista;
     }
 
-    public List<EntregaPendiente> obtenerCorregidas(String materia) {
+    public List<EntregaPendiente> obtenerCorregidas(int profesorId) {
         List<EntregaPendiente> lista = new ArrayList<EntregaPendiente>();
         SQLiteDatabase bd_corregidas = baseDeDatos.getReadableDatabase();
 
@@ -83,10 +83,10 @@ public class EntregaDao {
                 "INNER JOIN actividad act ON act.id_act = ent.actividad_id " +
                 "INNER JOIN alumnos alum ON alum.id = ent.alumno_id " +
                 "INNER JOIN calificaciones cal ON cal.entrega_id = ent.id_ent " +
-                "WHERE act.materia_act = ? " +
+                "WHERE act.profesor_id = ? " +
                 "ORDER BY ent.fecha_ent DESC";
 
-        Cursor fila = bd_corregidas.rawQuery(sql, new String[]{materia});
+        Cursor fila = bd_corregidas.rawQuery(sql, new String[]{String.valueOf(profesorId)});
 
         if (fila.moveToFirst()) {
             do {

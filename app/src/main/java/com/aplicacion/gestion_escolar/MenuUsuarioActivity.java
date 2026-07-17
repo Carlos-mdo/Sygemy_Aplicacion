@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.ImageButton;
@@ -144,9 +145,10 @@ public class MenuUsuarioActivity extends AppCompatActivity implements Controller
 
             txtUsuario.setText(nombre + " " + apellido);
             mostrarFoto(fotoUri);
-            android.util.Log.d("DEBUG_DASH", "curso_alum leido='" + curso + "'");
         }
         fila_carga_alum.close();
+
+        Log.d("DashboardAlumno", "curso_alum leído de la BD = [" + curso + "]");
 
         imgUsuario.setOnClickListener(v -> selectorImagen.launch(new String[]{"image/*"}));
 
@@ -154,9 +156,9 @@ public class MenuUsuarioActivity extends AppCompatActivity implements Controller
         if (curso != null) {
             cargarDashboardAlumno(curso, alumnoIdActual);
         }else {
+            Log.d("DashboardAlumno", "curso es null -> nunca se llega a buscar actividades");
             mostrarListaVacia(rvTareasPendientes, tvSinTareas, new ArrayList<>());
         }
-        android.util.Log.d("DEBUG_DASH", "alumnoIdActual=" + alumnoIdActual);
     }
     private void mostrarFoto(String fotoUri) {
         if (fotoUri == null || fotoUri.trim().isEmpty()) {
@@ -192,6 +194,7 @@ public class MenuUsuarioActivity extends AppCompatActivity implements Controller
     private void cargarDashboardAlumno(String curso, int alumnoId) {
         List<String> materias = obtenerMateriasDelCurso(curso);
         if (materias.isEmpty()) {
+            Log.d("DashboardAlumno", "No hay materias en 'horarios' para curso=[" + curso + "] -> se corta acá, dashboard queda vacío");
             mostrarListaVacia(rvTareasPendientes, tvSinTareas, new ArrayList<>());
             return;
         }
@@ -199,35 +202,50 @@ public class MenuUsuarioActivity extends AppCompatActivity implements Controller
         String placeholders = construirPlaceholders(materias.size());
 
         List<EventDashboard> tareasPendientes = new ArrayList<>();
-        String sql = "SELECT id_act, titulo_act, materia_act, fecha_act FROM actividad " +
-                "WHERE materia_act IN (" + placeholders + ") " +
-                "AND NOT EXISTS (SELECT 1 FROM entregas e WHERE e.actividad_id = actividad.id_act AND e.alumno_id = ?) " +
-                "ORDER BY fecha_act ASC LIMIT 5";
+        String sql = "SELECT a.id_act, a.titulo_act, a.materia_act, a.fecha_act, " +
+                "p.nombre_prof, p.apellido_prof " +
+                "FROM actividad a " +
+                "LEFT JOIN profesores p ON p.id = a.profesor_id " +
+                "WHERE TRIM(a.materia_act) COLLATE NOCASE IN (" + placeholders + ") " +
+                "AND NOT EXISTS (SELECT 1 FROM entregas e WHERE e.actividad_id = a.id_act AND e.alumno_id = ?) " +
+                "ORDER BY a.fecha_act ASC LIMIT 5";
+
         List<String> args = new ArrayList<>(materias);
         args.add(String.valueOf(alumnoId));
+        Log.d("DashboradAlumno", "SQL dashboard = " + sql);
+        Log.d("DashboradAlumno", "args = " + args);
+
         Cursor cursor = baseDeDatos.rawQuery(sql, args.toArray(new String[0]));
+        Log.d("DashboradAlumno", "filas devueltas por la query = " + cursor.getCount());
+
         while (cursor.moveToNext()) {
+            String nombreProfe = cursor.getString(4);
+            String apellidoProfe = cursor.getString(5);
+            String profesorTexto = (nombreProfe != null) ? nombreProfe + " " + apellidoProfe : "Profesor no asignado";
+
             tareasPendientes.add(new EventDashboard(
                     cursor.getString(1),
                     cursor.getString(2),
                     formatearFecha(cursor.getString(3)),
-                    EventDashboard.TIPO_ENTREGA));
+                    EventDashboard.TIPO_ENTREGA,
+                    profesorTexto));
         }
         cursor.close();
+        Log.d("DashboardAlumno", "tareasPendientes final = " + tareasPendientes.size());
         mostrarListaVacia(rvTareasPendientes, tvSinTareas, tareasPendientes);
-        android.util.Log.d("DEBUG_DASH", "curso='" + curso + "'");
-        android.util.Log.d("DEBUG_DASH", "materias=" + materias);
     }
 
     private List<String> obtenerMateriasDelCurso(String curso) {
         List<String> materias = new ArrayList<>();
         Cursor cursor = baseDeDatos.rawQuery(
-                "SELECT DISTINCT materia_hor FROM horarios WHERE curso_hor = ?",
+                "SELECT DISTINCT materia_hor FROM horarios " +
+                        "WHERE TRIM(curso_hor) = TRIM(?) COLLATE NOCASE",
                 new String[]{curso});
         while (cursor.moveToNext()) {
             materias.add(cursor.getString(0));
         }
         cursor.close();
+        Log.d("DashboardAlumno", "obtenerMateriasDelCurso([" + curso + "]) -> " + materias);
         return materias;
     }
     private String construirPlaceholders(int cantidad) {
@@ -258,7 +276,6 @@ public class MenuUsuarioActivity extends AppCompatActivity implements Controller
     }
     private void cargarDatosProfesor() {
         profesorIdActual = UsuarioDao.obtenerProfeId(this);
-        android.util.Log.d("DEBUG_PROFE", "cargarDatosProfesor -> profesorIdActual=" + profesorIdActual);
         if (profesorIdActual == -1) {
             txtUsuario.setText("Profesor/a");
             return;
@@ -271,9 +288,8 @@ public class MenuUsuarioActivity extends AppCompatActivity implements Controller
             String nombre = fila_carga_profe.getString(0);
             String apellido = fila_carga_profe.getString(1);
             String fotoUri = fila_carga_profe.getString(2);
-            android.util.Log.d("DEBUG_PROFE", "nombre=" + nombre + " apellido=" + apellido + " foto=" + fotoUri);
 
-            txtUsuario.setText("Profesor/a " + nombre + " " + apellido);
+            txtUsuario.setText(nombre + " " + apellido);
             mostrarFoto(fotoUri);
         } else {
             txtUsuario.setText("Profesor/a");
@@ -285,10 +301,9 @@ public class MenuUsuarioActivity extends AppCompatActivity implements Controller
         cargarDashboardProfesor();
     }
     private void cargarDashboardProfesor() {
-        String materia = UsuarioDao.obtenerMateria(this);
+       //String materia = UsuarioDao.obtenerMateria(this);
         EntregaDao entregaDao = new EntregaDao(this);
-        List<EntregaPendiente> pendientes = entregaDao.obtenerPendientes(materia);
-        android.util.Log.d("DEBUG_DASH_PROFE", "materia='" + materia + "' pendientes.size()=" + pendientes.size());
+        List<EntregaPendiente> pendientes = entregaDao.obtenerPendientes(profesorIdActual);
 
         boolean vacio = pendientes.isEmpty();
         rvEntregasPendientesProfesor.setVisibility(vacio ? View.GONE : View.VISIBLE);
@@ -341,10 +356,6 @@ public class MenuUsuarioActivity extends AppCompatActivity implements Controller
                 }
                 if(id == R.id.nav_correciones){
                     cargarFragment(new Fragment_Correciones());
-                    return true;
-                }
-                if(id== R.id.nav_cursos_profe){
-                    cargarFragment(new Fragment_Cursos_Profesores());
                     return true;
                 }
             }

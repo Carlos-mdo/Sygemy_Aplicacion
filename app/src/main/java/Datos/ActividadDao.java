@@ -45,7 +45,9 @@ public class ActividadDao {
                     fila.getString(fila.getColumnIndexOrThrow("archivo_nombre")),
                     fila.getString(fila.getColumnIndexOrThrow("archivo_url")),
                     fila.getString(fila.getColumnIndexOrThrow("materia_act")),
-                    fila.getInt(fila.getColumnIndexOrThrow("trimestre_id"))
+                    fila.getInt(fila.getColumnIndexOrThrow("trimestre_id")),
+                    fila.isNull(fila.getColumnIndexOrThrow("profesor_id")) ? -1 :
+                       fila.getInt(fila.getColumnIndexOrThrow("profesor_id"))
                 ));
             } while (fila.moveToNext());
         }

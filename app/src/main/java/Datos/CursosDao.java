@@ -9,14 +9,21 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import Entidades.Alumno;
+import Entidades.CursoConMaterias;
 import Entidades.Cursos;
 
 public class CursosDao {
 
     private AdminSQLiteOpenHelper dbHelper;
 
+    private Context context;
+    private  MateriaGradoDao materiaGradoDao;
+
     public CursosDao(Context context) {
+        this.context = context;
         dbHelper = new AdminSQLiteOpenHelper(context, "BD_Sygemy", null, 1);
+        materiaGradoDao = new MateriaGradoDao(context);
     }
     public int obtenerProfesorIdPorUsuario(int usuarioId) {
         int profesorId = -1;
@@ -40,6 +47,26 @@ public class CursosDao {
             }
         }
         return lista;
+    }
+    public List<Alumno> obtenerAlumnosPorProfesor(int profesorId, AlumnosDao alumnosDao) {
+        List<Alumno> resultado = new ArrayList<>();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery(
+                "SELECT DISTINCT curso_hor FROM horarios WHERE profesor_id = ?",
+                new String[]{String.valueOf(profesorId)}
+        );
+
+        List<String> cursos = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            cursos.add(cursor.getString(0));
+        }
+        cursor.close();
+
+        for (String curso : cursos) {
+            resultado.addAll(alumnosDao.obtenerAlumnosPorCurso(curso));
+        }
+        return resultado;
     }
     public String[] obtenerDatosProfesor(int profesorId) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -108,6 +135,41 @@ public class CursosDao {
         }
         return resultado;
     }
+    public List<CursoConMaterias> obtenerCursosConMateriasPorProfesor(int profesorId) {
+        List<Cursos> propios = obtenerCursosPorProfesor(profesorId); // uno por curso+materia
+
+        Map<String, List<Cursos>> porCurso = new LinkedHashMap<>();
+        for (Cursos c : propios) {
+            porCurso.computeIfAbsent(c.getNombreCurso(), k -> new ArrayList<>()).add(c);
+        }
+
+        List<CursoConMaterias> resultado = new ArrayList<>();
+        for (Map.Entry<String, List<Cursos>> entry : porCurso.entrySet()) {
+            String nombreCurso = entry.getKey();
+            List<Cursos> combos = entry.getValue();
+
+            List<String> materiasDelProfesor = new ArrayList<>();
+            StringBuilder horarioResumen = new StringBuilder();
+            for (Cursos c : combos) {
+                materiasDelProfesor.add(c.getMateria());
+                if (horarioResumen.length() > 0) horarioResumen.append(" | ");
+                horarioResumen.append(c.getMateria()).append(": ").append(c.getDias())
+                        .append(" ").append(c.getHoraInicio()).append("-").append(c.getHoraFin());
+            }
+
+            List<String> materiasDelGrado = materiaGradoDao.obtenerMateriasDeCurso(nombreCurso);
+            if (materiasDelGrado.isEmpty()) {
+                // Currícula todavía no cargada para este curso: al menos mostramos lo que dicta el profesor
+                materiasDelGrado = materiasDelProfesor;
+            }
+
+            int cantidadAlumnos = combos.get(0).getCantidadAlumnos();
+
+            resultado.add(new CursoConMaterias(
+                    nombreCurso, cantidadAlumnos, materiasDelGrado, materiasDelProfesor, horarioResumen.toString()));
+        }
+        return resultado;
+    }
     private int contarAlumnosDeCurso(SQLiteDatabase db, String nombreCurso) {
         int cantidad = 0;
         Cursor cursor = db.rawQuery(
@@ -122,5 +184,8 @@ public class CursosDao {
     }
     public void cerrar() {
         dbHelper.close();
+        if (materiaGradoDao != null) {
+            materiaGradoDao.cerrar();
+        }
     }
 }

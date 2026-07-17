@@ -8,12 +8,14 @@ public class EventDashboard {
     private String materia;
     private String fecha;
     private String tipo;
+    private String profesor;
 
-    public EventDashboard(String titulo, String materia, String fecha, String tipo) {
+    public EventDashboard(String titulo, String materia, String fecha, String tipo, String profesor) {
         this.titulo = titulo;
         this.materia = materia;
         this.fecha = fecha;
         this.tipo = tipo;
+        this.profesor = profesor;
     }
 
     public String getTitulo() {
@@ -32,6 +34,7 @@ public class EventDashboard {
         return tipo;
     }
 
+    public String getProfesor() { return profesor;}
     public boolean esExamen() {
         return TIPO_EXAMEN.equals(tipo);
     }

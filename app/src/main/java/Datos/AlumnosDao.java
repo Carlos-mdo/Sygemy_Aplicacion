@@ -34,7 +34,8 @@ public class AlumnosDao {
                         cursor.getString(cursor.getColumnIndexOrThrow("apellido_alum")),
                         cursor.getString(cursor.getColumnIndexOrThrow("genero_alum")),
                         cursor.getString(cursor.getColumnIndexOrThrow("curso_alum")),
-                        cursor.isNull(cursor.getColumnIndexOrThrow("usuario_id")) ? -1 : cursor.getInt(cursor.getColumnIndexOrThrow("usuario_id"))
+                        cursor.isNull(cursor.getColumnIndexOrThrow("usuario_id")) ? -1 : cursor.getInt(cursor.getColumnIndexOrThrow("usuario_id")),
+                        cursor.isNull(cursor.getColumnIndexOrThrow("cuotas_pagadas")) ? 0 : cursor.getInt(cursor.getColumnIndexOrThrow("cuotas_pagadas"))
                 );
                 lista.add(alumno);
             }

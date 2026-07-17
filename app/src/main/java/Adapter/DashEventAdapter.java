@@ -37,7 +37,7 @@ public class DashEventAdapter extends RecyclerView.Adapter<DashEventAdapter.Even
         EventDashboard evento = eventos.get(position);
 
         holder.tvEventoTitulo.setText(evento.getTitulo());
-        holder.tvEventoMateria.setText(evento.getMateria());
+        holder.tvEventoMateria.setText(evento.getMateria() + " . " + evento.getProfesor());
         holder.tvEventoFecha.setText(evento.getFecha());
 
         int color = evento.esExamen() ? Color.parseColor("#D32F2F") : Color.parseColor("#F9A825");

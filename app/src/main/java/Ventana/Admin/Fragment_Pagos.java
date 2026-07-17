@@ -74,34 +74,23 @@ public class Fragment_Pagos extends Fragment {
         adapter = new PagosAdapter(lista, servicio);
         recyclerPagos.setAdapter(adapter);
 
-        String fecha = new SimpleDateFormat(
-                "MMMM yyyy",
-                new Locale("es", "AR")
-        ).format(new Date());
+        String fecha = new SimpleDateFormat("MMMM yyyy", new Locale("es", "AR")).format(new Date());
 
-        txtFecha.setText(
-                fecha.substring(0,1).toUpperCase() + fecha.substring(1)
-        );
+        txtFecha.setText(fecha.substring(0,1).toUpperCase() + fecha.substring(1));
 
         String[] cursos = {
                 "Todos",
-                "1",
-                "2",
-                "3",
-                "4",
-                "5",
-                "6"
+                "1er Grado",
+                "2do Grado",
+                "3er Grado",
+                "4to Grado",
+                "5to Grado",
+                "6to Grado"
         };
 
-        ArrayAdapter<String> adapterCurso = new ArrayAdapter<>(
-                requireContext(),
-                android.R.layout.simple_spinner_item,
-                cursos
-        );
+        ArrayAdapter<String> adapterCurso = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, cursos);
 
-        adapterCurso.setDropDownViewResource(
-                android.R.layout.simple_spinner_dropdown_item
-        );
+        adapterCurso.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         spinnerCurso.setAdapter(adapterCurso);
 
@@ -109,10 +98,7 @@ public class Fragment_Pagos extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-                adapter.filtrar(
-                        etBuscar.getText().toString(),
-                        spinnerCurso.getSelectedItem().toString()
-                );
+                adapter.filtrar(etBuscar.getText().toString(), spinnerCurso.getSelectedItem().toString());
             }
 
             @Override
@@ -130,10 +116,7 @@ public class Fragment_Pagos extends Fragment {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
 
-                adapter.filtrar(
-                        s.toString(),
-                        spinnerCurso.getSelectedItem().toString()
-                );
+                adapter.filtrar(s.toString(), spinnerCurso.getSelectedItem().toString());
             }
 
             @Override
